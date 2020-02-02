@@ -8,3 +8,4 @@
 /vendor/
 /Godeps/
 .vscode/
+/node_modules/
