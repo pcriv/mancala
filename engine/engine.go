@@ -1,4 +1,4 @@
-package mancala
+package engine
 
 import (
 	"github.com/google/uuid"
@@ -13,24 +13,24 @@ var fullSidePits = [pitsPerSide]int{6, 6, 6, 6, 6, 6}
 type (
 	// Game represents a Mancala game.
 	Game struct {
-		ID         uuid.UUID
-		Turn       Turn
-		BoardSide1 BoardSide
-		BoardSide2 BoardSide
-		Result     Result
+		ID         uuid.UUID `json:"id"`
+		Turn       Turn      `json:"turn"`
+		BoardSide1 BoardSide `json:"board_side1"`
+		BoardSide2 BoardSide `json:"board_side2"`
+		Result     Result    `json:"result"`
 	}
 
 	// BoardSide represents one of the sides of the board
 	BoardSide struct {
-		Pits   [pitsPerSide]int
-		Store  int
-		Player Player
+		Pits   [pitsPerSide]int `json:"pits"`
+		Store  int              `json:"store"`
+		Player Player           `json:"player"`
 	}
 
 	// Player represents a player of the mancala game
 	Player struct {
-		Name  string
-		Score int
+		Name  string `json:"name"`
+		Score int    `json:"score"`
 	}
 
 	// Turn represents a turn on the mancala game, can be Player1Turn or Player2Turn
@@ -58,12 +58,15 @@ const (
 	Undefined
 )
 
-// Setup the initial state of the game.
-func (game *Game) Setup(player1Name string, player2Name string) {
+// NewGame initializes a manala game for the given players
+func NewGame(player1Name string, player2Name string) Game {
+	game := Game{}
 	game.ID = uuid.New()
 	game.BoardSide1.setup(player1Name)
 	game.BoardSide2.setup(player2Name)
 	game.Result = Undefined
+
+	return game
 }
 
 // PlayTurn from the given pitIndex for the current playingSide.
