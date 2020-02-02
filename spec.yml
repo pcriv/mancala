@@ -1,0 +1,252 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title:  Mancala API
+  license:
+    name: MIT
+servers:
+  - url: https://mancala.herokuapp.com/v1/
+paths:
+  /games:
+    post:
+      summary: Create game
+      operationId: createGame
+      tags:
+        - Games
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - player1
+                - player2
+              properties:
+                player1:
+                  type: string
+                player2:
+                  type: string
+      responses:
+        '201':
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+              example:
+                id: "37d5b35c-f90e-4136-90f8-500d6c43b1bf"
+                turn: 0
+                result: 4
+                board_side1:
+                  pits: [6, 6, 6, 6, 6, 6]
+                  store: 0
+                  player:
+                    name: Player1
+                    score: 0
+                board_side2:
+                  pits: [6, 6, 6, 6, 6, 6]
+                  store: 0
+                  player:
+                    name: Player2
+                    score: 0
+
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrors"
+              example:
+                errors:
+                  player1:
+                    - "player1 can not be blank."
+                  player2:
+                    - "player1 can not be blank."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /games/{id}:
+    get:
+      summary: Show game
+      description: Retrieves a game
+      operationId: showGame
+      tags:
+        - Games
+      responses:
+        '200':
+          description: Game
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+              example:
+                id: "37d5b35c-f90e-4136-90f8-500d6c43b1bf"
+                turn: 0
+                result: 3
+                board_side1:
+                  pits: [0, 7, 7, 7, 7, 7]
+                  store: 1
+                  player:
+                    name: Player1
+                    score: 0
+                board_side2:
+                  pits: [6, 6, 6, 6, 6, 6]
+                  store: 0
+                  player:
+                    name: Player2
+                    score: 0
+        '404':
+          description: Not found
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+    patch:
+      summary: Update game
+      description: Updates a game by playing the corresponding next turn
+      operationId: updateGame
+      tags:
+        - Games
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pit_index
+              properties:
+                pit_index:
+                  type: integer
+                  minimum: 0
+                  maximum: 5
+
+      responses:
+        '200':
+          description: Game updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+              example:
+                id: "37d5b35c-f90e-4136-90f8-500d6c43b1bf"
+                turn: 0
+                result: 3
+                board_side1:
+                  pits: [0, 7, 7, 7, 7, 7]
+                  store: 1
+                  player:
+                    name: Player1
+                    score: 0
+                board_side2:
+                  pits: [6, 6, 6, 6, 6, 6]
+                  store: 0
+                  player:
+                    name: Player2
+                    score: 0
+        '404':
+          description: Not found
+
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrors"
+              example:
+                errors:
+                  pit_index:
+                    - "pit index is invalid."
+                  base:
+                    - "select pit is empty."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+components:
+  schemas:
+    Result:
+      type: integer
+      description:
+        The result of the game. `0` = `Player1Wins`, `1` = `Player2Wins`, `2` = `Tie`, `3` = `Undefined`.
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+    Turn:
+      type: integer
+      description:
+        The turn that needs to play next. `0` = `Player1`, `1` = `Player2`.
+      enum:
+        - 0
+        - 1
+    Player:
+      type: object
+      properties:
+        name:
+          description: The name of the player
+          type: string
+        score:
+          description: The score of the player
+          type: integer
+    BoardSide:
+      type: object
+      description:
+        A side of the board
+      properties:
+        pits:
+          description: The pits of the board side
+          type: array
+          items:
+            type: integer
+            minimum: 0
+        store:
+          description: The store (big pit) of the board side
+          type: integer
+        player:
+          description: The player assigned to the board side
+          $ref: "#/components/schemas/Player"
+    Game:
+      type: object
+      properties:
+        id:
+          description: The id of the game
+          type: string
+        result:
+          $ref: "#/components/schemas/Result"
+        turn:
+          $ref: "#/components/schemas/Turn"
+        board_side1:
+          allOf:
+            - description: The upper side of the game board
+            - $ref: "#/components/schemas/BoardSide"
+        board_side2:
+          allOf:
+            - description: The lower side of the game board
+            - $ref: "#/components/schemas/BoardSide"
+    ValidationErrors:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: object
+    InternalServerError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
