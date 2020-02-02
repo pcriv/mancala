@@ -59,10 +59,8 @@ paths:
                 $ref: "#/components/schemas/ValidationErrors"
               example:
                 errors:
-                  player1:
-                    - "player1 can not be blank."
-                  player2:
-                    - "player1 can not be blank."
+                  - "player1 can not be blank."
+                  - "player2 can not be blank."
         '500':
           description: Internal server error
           content:
@@ -163,10 +161,8 @@ paths:
                 $ref: "#/components/schemas/ValidationErrors"
               example:
                 errors:
-                  pit_index:
-                    - "pit index is invalid."
-                  base:
-                    - "select pit is empty."
+                  - "pit index is invalid."
+                  - "selected pit is empty."
         '500':
           description: Internal server error
           content:
@@ -242,7 +238,9 @@ components:
         - errors
       properties:
         errors:
-          type: object
+          type: array
+          items:
+            type: string
     InternalServerError:
       type: object
       required:
