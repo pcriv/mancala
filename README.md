@@ -1,6 +1,6 @@
-# Mancala game
+# Mancala
 
-Implementation of the mancala game in Go.
+Mancala game implementation in Go as an API.
 
 
 ### Usage
@@ -19,7 +19,7 @@ import (
 func main() {
     game := engine.NewGame("Rick", "Morty")
     
-    // Player1 plays
+	// Player1 plays
 	game.PlayTurn(0)
 }
 ```
