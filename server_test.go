@@ -51,8 +51,6 @@ func TestCreateGame(t *testing.T) {
 }
 
 func TestUpdateGame(t *testing.T) {
-	t.Skip("There's seems to be a bug on the echo framework when calling c.SetParamValues.")
-
 	// Setup
 	e := echo.New()
 	g := engine.NewGame("Rick", "Morty")
@@ -76,20 +74,18 @@ func TestUpdateGame(t *testing.T) {
 		json.Unmarshal(rec.Body.Bytes(), &game)
 
 		assert.NotNil(t, g.ID, game.ID)
-		assert.Equal(t, 0, game.Turn)
-		assert.Equal(t, 3, game.Result)
+		assert.Equal(t, engine.Player1Turn, game.Turn)
+		assert.Equal(t, engine.Undefined, game.Result)
 		assert.Equal(t, [6]int{0, 7, 7, 7, 7, 7}, game.BoardSide1.Pits)
 		assert.Equal(t, [6]int{6, 6, 6, 6, 6, 6}, game.BoardSide2.Pits)
 		assert.Equal(t, 1, game.BoardSide1.Store)
-		assert.Equal(t, 0, game.BoardSide1.Store)
+		assert.Equal(t, 0, game.BoardSide2.Store)
 		assert.Equal(t, "Rick", game.BoardSide1.Player.Name)
 		assert.Equal(t, "Morty", game.BoardSide2.Player.Name)
 	}
 }
 
 func TestGetGame(t *testing.T) {
-	t.Skip("There's seems to be a bug on the echo framework when calling c.SetParamValues.")
-
 	// Setup
 	e := echo.New()
 	g := engine.NewGame("Rick", "Morty")
