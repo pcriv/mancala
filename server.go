@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"os"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pablocrivella/mancala/engine"
 	"github.com/pablocrivella/mancala/repo"
-	"golang.org/x/xerrors"
 )
 
 type (
@@ -86,7 +86,7 @@ func getGame(c echo.Context) error {
 	id := c.Param("id")
 	game, err := repo.GetGame(id)
 
-	if xerrors.Is(err, repo.ErrNotFound) {
+	if errors.Is(err, repo.ErrNotFound) {
 		return c.JSON(http.StatusNotFound, nil)
 	}
 
@@ -107,7 +107,7 @@ func updateGame(c echo.Context) error {
 	id := c.Param("id")
 	game, err := repo.GetGame(id)
 
-	if xerrors.Is(err, repo.ErrNotFound) {
+	if errors.Is(err, repo.ErrNotFound) {
 		return c.JSON(http.StatusNotFound, nil)
 	}
 

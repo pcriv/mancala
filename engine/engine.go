@@ -1,8 +1,9 @@
 package engine
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
-	"golang.org/x/xerrors"
 )
 
 const pitsPerSide = 6
@@ -72,17 +73,17 @@ func NewGame(player1Name string, player2Name string) Game {
 // PlayTurn from the given pitIndex for the current playingSide.
 func (game *Game) PlayTurn(pitIndex int) error {
 	if pitIndex < 0 || pitIndex > pitsPerSide-1 {
-		return xerrors.New("pit index is invalid.")
+		return errors.New("pit index is invalid.")
 	}
 
 	if game.IsDone() {
-		return xerrors.New("game is already done.")
+		return errors.New("game is already done.")
 	}
 
 	stones := game.playingSide().pickStones(pitIndex)
 
 	if stones == 0 {
-		return xerrors.New("selected pit is empty.")
+		return errors.New("selected pit is empty.")
 	}
 
 	game.placeStones(pitIndex+1, stones)

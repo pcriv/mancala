@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-redis/redis/v7"
 	"github.com/pablocrivella/mancala/engine"
-	"golang.org/x/xerrors"
 )
 
 var db *redis.Client
@@ -21,13 +20,13 @@ func Connect() error {
 	url, ok := os.LookupEnv("REDIS_URL")
 
 	if !ok {
-		return xerrors.New("missing env variable: REDIS_URL")
+		return errors.New("missing env variable: REDIS_URL")
 	}
 
 	options, err := redis.ParseURL(url)
 
 	if err != nil {
-		return xerrors.New(err.Error())
+		return errors.New(err.Error())
 	}
 
 	db = redis.NewClient(options)
