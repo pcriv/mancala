@@ -7,9 +7,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/pablocrivella/mancala/engine"
-	"github.com/pablocrivella/mancala/repo"
+	"github.com/pablocrivella/mancala/persistence"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,13 +32,27 @@ func TestCreateGame(t *testing.T) {
 	// Setup
 	e := echo.New()
 
+	s, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	defer s.Close()
+
+	repo := persistence.RedisRepo{}
+	err = repo.Connect("redis://" + s.Addr())
+
+	if err != nil {
+		panic(err)
+	}
+
+	h := GamesHandler{repo: &repo}
 	req := httptest.NewRequest(http.MethodPost, "/v1/games", strings.NewReader(createGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
 	// Assertions
-	if assert.NoError(t, createGame(c)) {
+	if assert.NoError(t, h.createGame(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 
 		var game engine.Game
@@ -55,8 +70,22 @@ func TestUpdateGame(t *testing.T) {
 	e := echo.New()
 	g := engine.NewGame("Rick", "Morty")
 
+	s, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	defer s.Close()
+
+	repo := persistence.RedisRepo{}
+	err = repo.Connect("redis://" + s.Addr())
+
+	if err != nil {
+		panic(err)
+	}
+
 	repo.SaveGame(g)
 
+	h := GamesHandler{repo: &repo}
 	req := httptest.NewRequest(http.MethodPatch, "/v1/games/:id", strings.NewReader(updateGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -66,7 +95,7 @@ func TestUpdateGame(t *testing.T) {
 	c.SetParamValues(g.ID.String())
 
 	// Assertions
-	if assert.NoError(t, updateGame(c)) {
+	if assert.NoError(t, h.updateGame(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 
 		var game engine.Game
@@ -90,7 +119,22 @@ func TestGetGame(t *testing.T) {
 	e := echo.New()
 	g := engine.NewGame("Rick", "Morty")
 
+	s, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	defer s.Close()
+
+	repo := persistence.RedisRepo{}
+	err = repo.Connect("redis://" + s.Addr())
+
+	if err != nil {
+		panic(err)
+	}
+
 	repo.SaveGame(g)
+
+	h := GamesHandler{repo: &repo}
 
 	req := httptest.NewRequest(http.MethodGet, "/v1/games/:id", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -101,7 +145,7 @@ func TestGetGame(t *testing.T) {
 	c.SetParamValues(g.ID.String())
 
 	// Assertions
-	if assert.NoError(t, getGame(c)) {
+	if assert.NoError(t, h.getGame(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 
 		var game engine.Game

@@ -3,6 +3,7 @@ module github.com/pablocrivella/mancala
 go 1.13
 
 require (
+	github.com/alicebob/miniredis/v2 v2.11.1
 	github.com/go-redis/redis/v7 v7.0.0-beta.6
 	github.com/gobuffalo/validate v2.0.4+incompatible
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect

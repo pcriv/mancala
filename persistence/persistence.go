@@ -1,54 +1,51 @@
-package repo
+package persistence
 
 import (
 	"encoding/json"
 	"errors"
-	"os"
 	"time"
 
 	"github.com/go-redis/redis/v7"
 	"github.com/pablocrivella/mancala/engine"
 )
 
-var db *redis.Client
+// Repo interface
+type Repo interface {
+	Connect(string) error
+	SaveGame(engine.Game) error
+	GetGame(string) (*engine.Game, error)
+}
 
 // ErrNotFound is when a game cannot be found in the database
 var ErrNotFound = errors.New("game not found")
 
+// RedisRepo is a redis backed repository
+type RedisRepo struct {
+	db *redis.Client
+}
+
 // Connect to the database
-func Connect() error {
-	url, ok := os.LookupEnv("REDIS_URL")
-
-	if !ok {
-		return errors.New("missing env variable: REDIS_URL")
-	}
-
+func (repo *RedisRepo) Connect(url string) error {
 	options, err := redis.ParseURL(url)
 
 	if err != nil {
 		return errors.New(err.Error())
 	}
 
-	db = redis.NewClient(options)
+	repo.db = redis.NewClient(options)
 
 	return nil
 }
 
 // SaveGame stores a game on the repo
-func SaveGame(game engine.Game) error {
+func (repo *RedisRepo) SaveGame(game engine.Game) error {
 	json, err := json.Marshal(game)
 
 	if err != nil {
 		return err
 	}
 
-	err = Connect()
-
-	if err != nil {
-		return err
-	}
-
-	err = db.Set(game.ID.String(), string(json), time.Hour*2).Err()
+	err = repo.db.Set(game.ID.String(), string(json), time.Hour*2).Err()
 
 	if err != nil {
 		return err
@@ -58,16 +55,10 @@ func SaveGame(game engine.Game) error {
 }
 
 // GetGame fetches a game from the repo
-func GetGame(id string) (*engine.Game, error) {
+func (repo *RedisRepo) GetGame(id string) (*engine.Game, error) {
 	var game engine.Game
 
-	err := Connect()
-
-	if err != nil {
-		return nil, err
-	}
-
-	val, err := db.Get(id).Result()
+	val, err := repo.db.Get(id).Result()
 
 	if err != nil {
 		return nil, ErrNotFound

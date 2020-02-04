@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pablocrivella/mancala/engine"
-	"github.com/pablocrivella/mancala/repo"
+	"github.com/pablocrivella/mancala/persistence"
 )
 
 type (
@@ -31,16 +31,30 @@ type (
 func main() {
 	e := echo.New()
 
+	redisURL, ok := os.LookupEnv("REDIS_URL")
+
+	if !ok {
+		panic("missing env variable: REDIS_URL")
+	}
+
+	repo := persistence.RedisRepo{}
+
+	if err := repo.Connect(redisURL); err != nil {
+		panic(err)
+	}
+
 	e.File("/docs", "public/docs.html")
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
 
+	GamesHandler := GamesHandler{repo: &repo}
+
 	v1 := e.Group("/v1")
-	v1.POST("/games", createGame)
-	v1.GET("/games/:id", getGame)
-	v1.PATCH("/games/:id", updateGame)
+	v1.POST("/games", GamesHandler.createGame)
+	v1.GET("/games/:id", GamesHandler.getGame)
+	v1.PATCH("/games/:id", GamesHandler.updateGame)
 
 	port := os.Getenv("PORT")
 
@@ -51,7 +65,12 @@ func main() {
 	e.Logger.Fatal(e.Start(":" + port))
 }
 
-func createGame(c echo.Context) error {
+// GamesHandler handles the request for the games resource.
+type GamesHandler struct {
+	repo persistence.Repo
+}
+
+func (h *GamesHandler) createGame(c echo.Context) error {
 	p := new(newGameParams)
 
 	if err := c.Bind(p); err != nil {
@@ -75,18 +94,18 @@ func createGame(c echo.Context) error {
 
 	g := engine.NewGame(p.Player1, p.Player2)
 
-	if err := repo.SaveGame(g); err != nil {
+	if err := h.repo.SaveGame(g); err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
 	return c.JSON(http.StatusCreated, g)
 }
 
-func getGame(c echo.Context) error {
+func (h *GamesHandler) getGame(c echo.Context) error {
 	id := c.Param("id")
-	game, err := repo.GetGame(id)
+	game, err := h.repo.GetGame(id)
 
-	if errors.Is(err, repo.ErrNotFound) {
+	if errors.Is(err, persistence.ErrNotFound) {
 		return c.JSON(http.StatusNotFound, nil)
 	}
 
@@ -97,7 +116,7 @@ func getGame(c echo.Context) error {
 	return c.JSON(http.StatusOK, game)
 }
 
-func updateGame(c echo.Context) error {
+func (h *GamesHandler) updateGame(c echo.Context) error {
 	p := new(playParams)
 
 	if err := c.Bind(p); err != nil {
@@ -105,9 +124,9 @@ func updateGame(c echo.Context) error {
 	}
 
 	id := c.Param("id")
-	game, err := repo.GetGame(id)
+	game, err := h.repo.GetGame(id)
 
-	if errors.Is(err, repo.ErrNotFound) {
+	if errors.Is(err, persistence.ErrNotFound) {
 		return c.JSON(http.StatusNotFound, nil)
 	}
 
@@ -121,7 +140,7 @@ func updateGame(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, validationErrors{[]string{err.Error()}})
 	}
 
-	repo.SaveGame(*game)
+	h.repo.SaveGame(*game)
 
 	return c.JSON(http.StatusOK, game)
 }
