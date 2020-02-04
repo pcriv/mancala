@@ -4,7 +4,7 @@ server:
 	env REDIS_URL="redis://127.0.0.1:6379/10" go run server.go
 
 test:
-	env REDIS_URL="redis://127.0.0.1:6379/15" go test ./...
+	go test ./...
 
 build_docs:
 	yarn redoc-cli bundle spec.yml -o public/docs.html
