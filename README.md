@@ -11,16 +11,15 @@ If you want to use the game engine:
 
 ```go
 import (
-	"fmt"
-
-	"github.com/pablocrivella/mancala/engine"
+    "fmt"
+    "github.com/pablocrivella/mancala/engine"
 )
 
 func main() {
     game := engine.NewGame("Rick", "Morty")
-    
-	// Player1 plays
-	game.PlayTurn(0)
+
+    // Player1 plays
+    game.PlayTurn(0)
 }
 ```
 
