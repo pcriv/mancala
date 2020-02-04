@@ -37,9 +37,9 @@ func main() {
 		panic("missing env variable: REDIS_URL")
 	}
 
-	repo := persistence.RedisRepo{}
+	repo, err := persistence.CreateRepo(redisURL)
 
-	if err := repo.Connect(redisURL); err != nil {
+	if err != nil {
 		panic(err)
 	}
 
@@ -49,7 +49,7 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
 
-	GamesHandler := GamesHandler{repo: &repo}
+	GamesHandler := GamesHandler{repo: repo}
 
 	v1 := e.Group("/v1")
 	v1.POST("/games", GamesHandler.createGame)

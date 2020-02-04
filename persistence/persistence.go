@@ -11,7 +11,6 @@ import (
 
 // Repo interface
 type Repo interface {
-	Connect(string) error
 	SaveGame(engine.Game) error
 	GetGame(string) (*engine.Game, error)
 }
@@ -19,26 +18,31 @@ type Repo interface {
 // ErrNotFound is when a game cannot be found in the database
 var ErrNotFound = errors.New("game not found")
 
-// RedisRepo is a redis backed repository
-type RedisRepo struct {
+// redisRepo is a redis backed repository
+type redisRepo struct {
 	db *redis.Client
 }
 
-// Connect to the database
-func (repo *RedisRepo) Connect(url string) error {
+// CreateRepo gets a Repo
+func CreateRepo(url string) (Repo, error) {
 	options, err := redis.ParseURL(url)
 
 	if err != nil {
-		return errors.New(err.Error())
+		return nil, err
 	}
 
-	repo.db = redis.NewClient(options)
+	client := redis.NewClient(options)
+	_, err = client.Ping().Result()
 
-	return nil
+	if err != nil {
+		return nil, err
+	}
+
+	return &redisRepo{db: client}, nil
 }
 
 // SaveGame stores a game on the repo
-func (repo *RedisRepo) SaveGame(game engine.Game) error {
+func (repo *redisRepo) SaveGame(game engine.Game) error {
 	json, err := json.Marshal(game)
 
 	if err != nil {
@@ -55,7 +59,7 @@ func (repo *RedisRepo) SaveGame(game engine.Game) error {
 }
 
 // GetGame fetches a game from the repo
-func (repo *RedisRepo) GetGame(id string) (*engine.Game, error) {
+func (repo *redisRepo) GetGame(id string) (*engine.Game, error) {
 	var game engine.Game
 
 	val, err := repo.db.Get(id).Result()

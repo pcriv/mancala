@@ -38,14 +38,13 @@ func TestCreateGame(t *testing.T) {
 	}
 	defer s.Close()
 
-	repo := persistence.RedisRepo{}
-	err = repo.Connect("redis://" + s.Addr())
+	repo, err := persistence.CreateRepo("redis://" + s.Addr())
 
 	if err != nil {
 		panic(err)
 	}
 
-	h := GamesHandler{repo: &repo}
+	h := GamesHandler{repo: repo}
 	req := httptest.NewRequest(http.MethodPost, "/v1/games", strings.NewReader(createGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -76,8 +75,7 @@ func TestUpdateGame(t *testing.T) {
 	}
 	defer s.Close()
 
-	repo := persistence.RedisRepo{}
-	err = repo.Connect("redis://" + s.Addr())
+	repo, err := persistence.CreateRepo("redis://" + s.Addr())
 
 	if err != nil {
 		panic(err)
@@ -85,7 +83,7 @@ func TestUpdateGame(t *testing.T) {
 
 	repo.SaveGame(g)
 
-	h := GamesHandler{repo: &repo}
+	h := GamesHandler{repo: repo}
 	req := httptest.NewRequest(http.MethodPatch, "/v1/games/:id", strings.NewReader(updateGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -125,8 +123,7 @@ func TestGetGame(t *testing.T) {
 	}
 	defer s.Close()
 
-	repo := persistence.RedisRepo{}
-	err = repo.Connect("redis://" + s.Addr())
+	repo, err := persistence.CreateRepo("redis://" + s.Addr())
 
 	if err != nil {
 		panic(err)
@@ -134,8 +131,7 @@ func TestGetGame(t *testing.T) {
 
 	repo.SaveGame(g)
 
-	h := GamesHandler{repo: &repo}
-
+	h := GamesHandler{repo: repo}
 	req := httptest.NewRequest(http.MethodGet, "/v1/games/:id", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
