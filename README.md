@@ -2,9 +2,7 @@
 
 Mancala game implementation in Go as an API.
 
-
-### Usage
-
+## Usage
 
 If you want to use the game engine:
 
@@ -27,19 +25,19 @@ If you want to use the API go to https://go-mancala.herokuapp.com/docs
 
 To create a new game:
 
-```
+```bash
 curl -X POST https://go-mancala.herokuapp.com/v1/games -H "Content-Type: application/json" --data '{"player1":"Rick","player2":"Morty"}'
 ```
 
 To show the state of a game:
 
-```
+```bash
 curl https://go-mancala.herokuapp.com/v1/games/:id
 ```
 
 To perform the next play:
 
-```
+```bash
 curl -X PATCH https://go-mancala.herokuapp.com/v1/games/:id -H "Content-Type: application/json" --data '{"pit_index":0}'
 ```
 
