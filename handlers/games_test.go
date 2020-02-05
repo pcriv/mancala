@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -28,7 +28,7 @@ var (
 	`
 )
 
-func TestCreateGame(t *testing.T) {
+func TestCreate(t *testing.T) {
 	// Setup
 	e := echo.New()
 
@@ -44,14 +44,14 @@ func TestCreateGame(t *testing.T) {
 		panic(err)
 	}
 
-	h := GamesHandler{repo: repo}
+	h := Games{Repo: repo}
 	req := httptest.NewRequest(http.MethodPost, "/v1/games", strings.NewReader(createGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
 	// Assertions
-	if assert.NoError(t, h.createGame(c)) {
+	if assert.NoError(t, h.Create(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 
 		var game engine.Game
@@ -64,7 +64,7 @@ func TestCreateGame(t *testing.T) {
 	}
 }
 
-func TestUpdateGame(t *testing.T) {
+func TestUpdate(t *testing.T) {
 	// Setup
 	e := echo.New()
 	g := engine.NewGame("Rick", "Morty")
@@ -83,7 +83,7 @@ func TestUpdateGame(t *testing.T) {
 
 	repo.SaveGame(g)
 
-	h := GamesHandler{repo: repo}
+	h := Games{Repo: repo}
 	req := httptest.NewRequest(http.MethodPatch, "/v1/games/:id", strings.NewReader(updateGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -93,7 +93,7 @@ func TestUpdateGame(t *testing.T) {
 	c.SetParamValues(g.ID.String())
 
 	// Assertions
-	if assert.NoError(t, h.updateGame(c)) {
+	if assert.NoError(t, h.Update(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 
 		var game engine.Game
@@ -112,7 +112,7 @@ func TestUpdateGame(t *testing.T) {
 	}
 }
 
-func TestGetGame(t *testing.T) {
+func TestGet(t *testing.T) {
 	// Setup
 	e := echo.New()
 	g := engine.NewGame("Rick", "Morty")
@@ -131,7 +131,7 @@ func TestGetGame(t *testing.T) {
 
 	repo.SaveGame(g)
 
-	h := GamesHandler{repo: repo}
+	h := Games{Repo: repo}
 	req := httptest.NewRequest(http.MethodGet, "/v1/games/:id", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -141,7 +141,7 @@ func TestGetGame(t *testing.T) {
 	c.SetParamValues(g.ID.String())
 
 	// Assertions
-	if assert.NoError(t, h.getGame(c)) {
+	if assert.NoError(t, h.Get(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 
 		var game engine.Game
