@@ -1,8 +1,8 @@
-FROM golang:1.13
+FROM golang:1.14
 
 WORKDIR /app
 
 COPY ./ ./
 
 EXPOSE 1323
-ENTRYPOINT ["go", "run", "server.go"]
+ENTRYPOINT ["go", "run", "./cmd/api"]
