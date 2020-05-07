@@ -241,6 +241,13 @@ components:
           type: array
           items:
             type: string
+    BadRequestError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
     InternalServerError:
       type: object
       required:

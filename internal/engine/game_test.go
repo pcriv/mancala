@@ -83,7 +83,7 @@ func TestPlayTurn(t *testing.T) {
 	game = NewGame("Rick", "Morty")
 	err := game.PlayTurn(8)
 
-	assert.Equal(t, err.Error(), "pit index is invalid")
+	assert.Equal(t, err.Error(), "invalid play: pit index is invalid")
 
 	// Test scenario where the selected pit is empty
 
@@ -91,7 +91,7 @@ func TestPlayTurn(t *testing.T) {
 	game.BoardSide1.Pits = [6]int{0, 0, 0, 0, 0, 1}
 	err = game.PlayTurn(0)
 
-	assert.Equal(t, err.Error(), "selected pit is empty")
+	assert.Equal(t, err.Error(), "invalid play: selected pit is empty")
 
 	// Test scenario where the game is already done
 
@@ -103,7 +103,7 @@ func TestPlayTurn(t *testing.T) {
 
 	err = game.PlayTurn(0)
 
-	assert.Equal(t, err.Error(), "game is already done")
+	assert.Equal(t, err.Error(), "invalid play: game is already done")
 }
 
 func TestIsDone(t *testing.T) {

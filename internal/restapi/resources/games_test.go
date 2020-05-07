@@ -1,4 +1,4 @@
-package handlers
+package resources
 
 import (
 	"encoding/json"
@@ -9,8 +9,9 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/labstack/echo/v4"
-	"github.com/pablocrivella/mancala/engine"
-	"github.com/pablocrivella/mancala/persistence"
+	"github.com/pablocrivella/mancala/internal/engine"
+	"github.com/pablocrivella/mancala/internal/games"
+	"github.com/pablocrivella/mancala/internal/infrastructure/persistence"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,23 +29,21 @@ var (
 	`
 )
 
-func TestCreate(t *testing.T) {
+func TestGamesResource_Create(t *testing.T) {
 	// Setup
 	e := echo.New()
-
 	s, err := miniredis.Run()
 	if err != nil {
 		panic(err)
 	}
 	defer s.Close()
 
-	repo, err := persistence.CreateRepo("redis://" + s.Addr())
-
+	gr, err := persistence.NewGameRepo("redis://" + s.Addr())
 	if err != nil {
 		panic(err)
 	}
 
-	h := Games{Repo: repo}
+	h := GamesResource{GamesService: games.NewService(gr)}
 	req := httptest.NewRequest(http.MethodPost, "/v1/games", strings.NewReader(createGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -64,26 +63,27 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestUpdate(t *testing.T) {
+func TestGamesResource_Update(t *testing.T) {
 	// Setup
 	e := echo.New()
-	g := engine.NewGame("Rick", "Morty")
-
 	s, err := miniredis.Run()
 	if err != nil {
 		panic(err)
 	}
 	defer s.Close()
 
-	repo, err := persistence.CreateRepo("redis://" + s.Addr())
-
+	gr, err := persistence.NewGameRepo("redis://" + s.Addr())
 	if err != nil {
 		panic(err)
 	}
 
-	repo.SaveGame(g)
+	gs := games.NewService(gr)
+	g, err := gs.CreateGame("Rick", "Morty")
+	if err != nil {
+		panic(err)
+	}
 
-	h := Games{Repo: repo}
+	h := GamesResource{GamesService: gs}
 	req := httptest.NewRequest(http.MethodPatch, "/v1/games/:id", strings.NewReader(updateGameReqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -112,26 +112,27 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-func TestGet(t *testing.T) {
+func TestGamesResorce_Show(t *testing.T) {
 	// Setup
 	e := echo.New()
-	g := engine.NewGame("Rick", "Morty")
-
 	s, err := miniredis.Run()
 	if err != nil {
 		panic(err)
 	}
 	defer s.Close()
 
-	repo, err := persistence.CreateRepo("redis://" + s.Addr())
-
+	gr, err := persistence.NewGameRepo("redis://" + s.Addr())
 	if err != nil {
 		panic(err)
 	}
 
-	repo.SaveGame(g)
+	gs := games.NewService(gr)
+	g, err := gs.CreateGame("Rick", "Morty")
+	if err != nil {
+		panic(err)
+	}
 
-	h := Games{Repo: repo}
+	h := GamesResource{GamesService: gs}
 	req := httptest.NewRequest(http.MethodGet, "/v1/games/:id", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -141,7 +142,7 @@ func TestGet(t *testing.T) {
 	c.SetParamValues(g.ID.String())
 
 	// Assertions
-	if assert.NoError(t, h.Get(c)) {
+	if assert.NoError(t, h.Show(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 
 		var game engine.Game

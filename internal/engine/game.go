@@ -1,15 +1,15 @@
 package engine
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 )
 
-const pitsPerSide = 6
-
-var emptySidePits = [pitsPerSide]int{}
-var fullSidePits = [pitsPerSide]int{6, 6, 6, 6, 6, 6}
+var (
+	emptySidePits = [pitsPerSide]int{}
+	fullSidePits  = [pitsPerSide]int{6, 6, 6, 6, 6, 6}
+)
 
 const (
 	// Player1Turn represents the turn of the Player #1
@@ -24,6 +24,7 @@ const (
 	Tie
 	// Undefined represents a yet undefined result for a game
 	Undefined
+	pitsPerSide = 6
 )
 
 type (
@@ -41,22 +42,31 @@ type (
 
 	// Result represents the result of the game after it is done, can be Player1Wins, Player2Wins or Tie
 	Result int
+
+	// ErrInvalidPlay represents an invalid play error.
+	ErrInvalidPlay struct {
+		Msg string
+	}
 )
+
+func (e *ErrInvalidPlay) Error() string {
+	return fmt.Sprintf("invalid play: %v", e.Msg)
+}
 
 // PlayTurn from the given pitIndex for the current playingSide.
 func (game *Game) PlayTurn(pitIndex int) error {
 	if pitIndex < 0 || pitIndex > pitsPerSide-1 {
-		return errors.New("pit index is invalid")
+		return &ErrInvalidPlay{Msg: "pit index is invalid"}
 	}
 
 	if game.IsDone() {
-		return errors.New("game is already done")
+		return &ErrInvalidPlay{Msg: "game is already done"}
 	}
 
 	stones := game.playingSide().pickStones(pitIndex)
 
 	if stones == 0 {
-		return errors.New("selected pit is empty")
+		return &ErrInvalidPlay{Msg: "selected pit is empty"}
 	}
 
 	game.placeStones(pitIndex+1, stones)

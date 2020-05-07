@@ -1,13 +1,16 @@
-.PHONY: server build_docs serve_docs
+.PHONY: server test build_docs serve_docs
+
+API_SPEC="api/openapi-spec/spec.yml"
+REDIS_URL="redis://127.0.0.1:6379/10"
 
 server:
-	env REDIS_URL="redis://127.0.0.1:6379/10" go run server.go
+	env REDIS_URL=$(REDIS_URL) go run ./cmd/api
 
 test:
 	go test ./...
 
-build_docs:
-	yarn redoc-cli bundle spec.yml -o public/docs.html
+docs.build:
+	yarn redoc-cli bundle $(API_SPEC) -o website/public/index.html
 
-serve_docs:
-	yarn redoc-cli serve spec.yml -w
+docs.serve:
+	yarn redoc-cli serve $(API_SPEC) -w
