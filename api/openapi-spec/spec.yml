@@ -1,3 +1,4 @@
+---
 openapi: "3.0.0"
 info:
   version: 1.0.0
@@ -28,7 +29,7 @@ paths:
                 player2:
                   type: string
       responses:
-        '201':
+        "201":
           description: Game created
           content:
             application/json:
@@ -51,7 +52,7 @@ paths:
                     name: Player2
                     score: 0
 
-        '422':
+        "422":
           description: Unprocessable entity
           content:
             application/json:
@@ -61,7 +62,7 @@ paths:
                 errors:
                   - "player1 can not be blank."
                   - "player2 can not be blank."
-        '500':
+        "500":
           description: Internal server error
           content:
             application/json:
@@ -69,6 +70,13 @@ paths:
                 $ref: "#/components/schemas/InternalServerError"
 
   /games/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
     get:
       summary: Show game
       description: Retrieves a game
@@ -76,7 +84,7 @@ paths:
       tags:
         - Games
       responses:
-        '200':
+        "200":
           description: Game
           content:
             application/json:
@@ -98,10 +106,10 @@ paths:
                   player:
                     name: Player2
                     score: 0
-        '404':
+        "404":
           description: Not found
 
-        '500':
+        "500":
           description: Internal server error
           content:
             application/json:
@@ -119,6 +127,7 @@ paths:
           application/json:
             schema:
               type: object
+              additionalProperties: false
               required:
                 - pit_index
               properties:
@@ -126,9 +135,10 @@ paths:
                   type: integer
                   minimum: 0
                   maximum: 5
+                  format: int32
 
       responses:
-        '200':
+        "200":
           description: Game updated
           content:
             application/json:
@@ -150,10 +160,10 @@ paths:
                   player:
                     name: Player2
                     score: 0
-        '404':
+        "404":
           description: Not found
 
-        '422':
+        "422":
           description: Unprocessable entity
           content:
             application/json:
@@ -163,7 +173,7 @@ paths:
                 errors:
                   - "pit index is invalid."
                   - "selected pit is empty."
-        '500':
+        "500":
           description: Internal server error
           content:
             application/json:
@@ -197,6 +207,7 @@ components:
         score:
           description: The score of the player
           type: integer
+          format: int32
     BoardSide:
       type: object
       description:
@@ -205,9 +216,11 @@ components:
         pits:
           description: The pits of the board side
           type: array
+          maxItems: 6
           items:
             type: integer
             minimum: 0
+            format: int32
         store:
           description: The store (big pit) of the board side
           type: integer
