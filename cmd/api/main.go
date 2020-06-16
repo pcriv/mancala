@@ -16,11 +16,11 @@ func main() {
 	if !ok {
 		panic("missing env variable: REDIS_URL")
 	}
-
-	g, err := persistence.NewGameRepo(redisURL)
+	redisClient, err := persistence.NewRedisClient(redisURL)
 	if err != nil {
 		panic(err)
 	}
+	gameRepo := persistence.NewGameRepo(redisClient)
 
 	e := echo.New()
 	e.File("/", "website/public/index.html")
@@ -29,18 +29,17 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
 
-	api := restapi.App{
-		GamesResource: &resources.GamesResource{
-			GamesService: games.NewService(g),
+	r := restapi.Resources{
+		Games: resources.GamesResource{
+			GamesService: games.NewService(gameRepo),
 		},
 	}
 	v1 := e.Group("/v1")
-	v1.GET("/games/:id", api.GamesResource.Show)
-	v1.POST("/games", api.GamesResource.Create)
-	v1.PATCH("/games/:id", api.GamesResource.Update)
+	v1.GET("/games/:id", r.Games.Show)
+	v1.POST("/games", r.Games.Create)
+	v1.PATCH("/games/:id", r.Games.Update)
 
 	port := os.Getenv("PORT")
-
 	if len(port) == 0 {
 		port = "1323"
 	}

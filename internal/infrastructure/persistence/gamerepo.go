@@ -7,38 +7,27 @@ import (
 
 	"github.com/go-redis/redis/v7"
 	"github.com/pablocrivella/mancala/internal/engine"
+	"github.com/pablocrivella/mancala/internal/games"
 )
 
 type (
 	// GameRepo is a redis backed game repo.
-	GameRepo struct {
+	gameRepo struct {
 		db *redis.Client
 	}
 )
 
 // NewGameRepo creates a new GameRepo.
-func NewGameRepo(url string) (*GameRepo, error) {
-	options, err := redis.ParseURL(url)
-	if err != nil {
-		return nil, err
-	}
-
-	client := redis.NewClient(options)
-	_, err = client.Ping().Result()
-	if err != nil {
-		return nil, err
-	}
-
-	return &GameRepo{db: client}, nil
+func NewGameRepo(client *redis.Client) games.GameRepo {
+	return gameRepo{db: client}
 }
 
 // Save stores a game on redis.
-func (r *GameRepo) Save(g *engine.Game) error {
+func (r gameRepo) Save(g engine.Game) error {
 	json, err := json.Marshal(g)
 	if err != nil {
 		return err
 	}
-
 	err = r.db.Set(g.ID.String(), string(json), time.Hour*2).Err()
 	if err != nil {
 		return err
@@ -47,16 +36,15 @@ func (r *GameRepo) Save(g *engine.Game) error {
 }
 
 // Find fetches a game with the given ID from redis.
-func (r *GameRepo) Find(id string) (*engine.Game, error) {
+func (r gameRepo) Find(id string) (engine.Game, error) {
 	var g engine.Game
 	val, err := r.db.Get(id).Result()
 	if err != nil {
-		return nil, &ErrNotFound{Msg: fmt.Sprintf("cannot find with id %v", id)}
+		return g, &NotFoundError{Msg: fmt.Sprintf("cannot find game with id %v", id)}
 	}
-
 	err = json.Unmarshal([]byte(val), &g)
 	if err != nil {
-		return nil, err
+		return g, err
 	}
-	return &g, nil
+	return g, nil
 }

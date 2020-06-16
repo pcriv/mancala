@@ -13,7 +13,7 @@ import (
 type (
 	// GamesResource handles the requests for the games resource.
 	GamesResource struct {
-		GamesService *games.Service
+		GamesService games.Service
 	}
 
 	CreateGameRequestBody struct {
@@ -26,7 +26,7 @@ type (
 	}
 )
 
-func (h *GamesResource) Create(c echo.Context) error {
+func (h GamesResource) Create(c echo.Context) error {
 	b := new(CreateGameRequestBody)
 	if err := c.Bind(b); err != nil {
 		code := http.StatusInternalServerError
@@ -48,11 +48,11 @@ func (h *GamesResource) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, g)
 }
 
-func (h *GamesResource) Show(c echo.Context) error {
+func (h GamesResource) Show(c echo.Context) error {
 	g, err := h.GamesService.FindGame(c.Param("id"))
 	if err != nil {
 		switch e := err.(type) {
-		case *persistence.ErrNotFound:
+		case *persistence.NotFoundError:
 			return c.JSON(http.StatusNotFound, e.Error())
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, e.Error())
@@ -62,7 +62,7 @@ func (h *GamesResource) Show(c echo.Context) error {
 	return c.JSON(http.StatusOK, g)
 }
 
-func (h *GamesResource) Update(c echo.Context) error {
+func (h GamesResource) Update(c echo.Context) error {
 	b := new(UpdateGameRequestBody)
 	if err := c.Bind(b); err != nil {
 		code := http.StatusInternalServerError
@@ -75,9 +75,9 @@ func (h *GamesResource) Update(c echo.Context) error {
 	g, err := h.GamesService.ExecutePlay(c.Param("id"), b.PitIndex)
 	if err != nil {
 		switch e := err.(type) {
-		case *persistence.ErrNotFound:
+		case *persistence.NotFoundError:
 			return c.JSON(http.StatusNotFound, e.Error())
-		case *engine.ErrInvalidPlay:
+		case *engine.InvalidPlayError:
 			return echo.NewHTTPError(
 				http.StatusUnprocessableEntity,
 				ValidationErrors{Errors: []ValidationError{{Field: "base", Msg: e.Error()}}},

@@ -4,11 +4,11 @@ import "fmt"
 
 type (
 	// ErrNotFound happens when the request record is not found on the storage.
-	ErrNotFound struct {
+	NotFoundError struct {
 		Msg string
 	}
 )
 
-func (e *ErrNotFound) Error() string {
+func (e *NotFoundError) Error() string {
 	return fmt.Sprintf("not found error: %v", e.Msg)
 }
