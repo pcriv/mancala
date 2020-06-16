@@ -1,6 +1,10 @@
 package persistence
 
-import "github.com/go-redis/redis/v7"
+import (
+	"context"
+
+	"github.com/go-redis/redis/v8"
+)
 
 // NewRedisClient returns a redis client.
 func NewRedisClient(url string) (*redis.Client, error) {
@@ -9,7 +13,7 @@ func NewRedisClient(url string) (*redis.Client, error) {
 		return nil, err
 	}
 	client := redis.NewClient(options)
-	_, err = client.Ping().Result()
+	_, err = client.Ping(context.Background()).Result()
 	if err != nil {
 		return nil, err
 	}

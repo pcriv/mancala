@@ -1,11 +1,12 @@
 package persistence
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"github.com/pablocrivella/mancala/internal/engine"
 	"github.com/pablocrivella/mancala/internal/games"
 )
@@ -28,7 +29,7 @@ func (r gameRepo) Save(g engine.Game) error {
 	if err != nil {
 		return err
 	}
-	err = r.db.Set(g.ID.String(), string(json), time.Hour*2).Err()
+	err = r.db.Set(context.Background(), g.ID.String(), string(json), time.Hour*2).Err()
 	if err != nil {
 		return err
 	}
@@ -38,7 +39,7 @@ func (r gameRepo) Save(g engine.Game) error {
 // Find fetches a game with the given ID from redis.
 func (r gameRepo) Find(id string) (engine.Game, error) {
 	var g engine.Game
-	val, err := r.db.Get(id).Result()
+	val, err := r.db.Get(context.Background(), id).Result()
 	if err != nil {
 		return g, &NotFoundError{Msg: fmt.Sprintf("cannot find game with id %v", id)}
 	}

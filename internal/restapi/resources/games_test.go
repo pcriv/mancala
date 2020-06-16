@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/pablocrivella/mancala/internal/engine"
 	"github.com/pablocrivella/mancala/internal/games"
