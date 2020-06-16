@@ -3,7 +3,7 @@ package persistence
 import "fmt"
 
 type (
-	// ErrNotFound happens when the request record is not found on the storage.
+	// NotFoundError happens when the request record is not found on the storage.
 	NotFoundError struct {
 		Msg string
 	}
