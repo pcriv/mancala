@@ -30,7 +30,7 @@ func (s Service) FindGame(id string) (engine.Game, error) {
 	return g, nil
 }
 
-func (s Service) ExecutePlay(gameID string, pitIndex int) (engine.Game, error) {
+func (s Service) ExecutePlay(gameID string, pitIndex int64) (engine.Game, error) {
 	g, err := s.gameRepo.Find(gameID)
 	if err != nil {
 		return engine.Game{}, err

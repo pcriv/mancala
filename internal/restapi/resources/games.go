@@ -22,7 +22,7 @@ type (
 	}
 
 	UpdateGameRequestBody struct {
-		PitIndex int `json:"pit_index"`
+		PitIndex int64 `json:"pit_index"`
 	}
 )
 

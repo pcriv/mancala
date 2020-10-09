@@ -10,7 +10,7 @@ func TestGame_PlayTurn(t *testing.T) {
 	testCases := []struct {
 		name         string
 		game         Game
-		pitIndex     int
+		pitIndex     int64
 		wantedGame   Game
 		wantedErrMsg string
 	}{
@@ -196,6 +196,6 @@ func TestIsDone(t *testing.T) {
 	}
 }
 
-func buildPits(a, b, c, d, e, f int) pitsArray {
+func buildPits(a, b, c, d, e, f int64) pitsArray {
 	return pitsArray{a, b, c, d, e, f}
 }

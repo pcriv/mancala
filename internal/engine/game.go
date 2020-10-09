@@ -22,7 +22,7 @@ const (
 	Tie
 )
 
-const pitsPerSide = 6
+const pitsPerSide int64 = 6
 
 type (
 	// Game represents a Mancala game.
@@ -35,14 +35,14 @@ type (
 	}
 
 	// Turn represents a turn on the mancala game, can be Player1Turn or Player2Turn
-	Turn int
+	Turn int64
 
 	// Result represents the result of the game after it is done, can be Player1Wins, Player2Wins or Tie
-	Result int
+	Result int64
 )
 
 // PlayTurn from the given pitIndex for the current playingSide.
-func (game *Game) PlayTurn(pitIndex int) error {
+func (game *Game) PlayTurn(pitIndex int64) error {
 	if pitIndex < 0 || pitIndex > pitsPerSide-1 {
 		return &InvalidPlayError{Msg: "pit index is invalid"}
 	}
@@ -84,7 +84,7 @@ func (game *Game) calculateScores() {
 	}
 }
 
-func (game *Game) placeStones(pitIndex int, stones int) {
+func (game *Game) placeStones(pitIndex int64, stones int64) {
 	for index := pitIndex; index < pitsPerSide; index++ {
 		stones = game.playingSide().placeStone(index, stones)
 
@@ -114,8 +114,8 @@ func (game *Game) placeStones(pitIndex int, stones int) {
 		return
 	}
 
-	for index := 0; index < pitsPerSide; index++ {
-		stones = game.opposingSide().placeStone(index, stones)
+	for index := 0; int64(index) < pitsPerSide; index++ {
+		stones = game.opposingSide().placeStone(int64(index), stones)
 
 		if stones == 0 {
 			game.changeTurn()

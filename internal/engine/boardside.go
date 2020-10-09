@@ -1,11 +1,11 @@
 package engine
 
 type (
-	pitsArray [pitsPerSide]int
+	pitsArray [pitsPerSide]int64
 	// BoardSide represents one of the sides of the board
 	BoardSide struct {
 		Pits   pitsArray `json:"pits"`
-		Store  int       `json:"store"`
+		Store  int64     `json:"store"`
 		Player Player    `json:"player"`
 	}
 )
@@ -28,7 +28,7 @@ func (side *BoardSide) isEmpty() bool {
 }
 
 func (side *BoardSide) score() {
-	score := 0
+	var score int64
 	for _, pitStones := range side.Pits {
 		score += pitStones
 	}
@@ -36,22 +36,22 @@ func (side *BoardSide) score() {
 	side.Player.Score = score
 }
 
-func (side *BoardSide) pickStones(pitIndex int) int {
+func (side *BoardSide) pickStones(pitIndex int64) int64 {
 	stones := side.Pits[pitIndex]
 	side.Pits[pitIndex] = 0
 	return stones
 }
 
-func (side *BoardSide) placeStone(pitIndex int, stones int) int {
+func (side *BoardSide) placeStone(pitIndex int64, stones int64) int64 {
 	side.Pits[pitIndex]++
 	return stones - 1
 }
 
-func (side *BoardSide) captureStone(stones int) int {
+func (side *BoardSide) captureStone(stones int64) int64 {
 	side.Store++
 	return stones - 1
 }
 
-func (side *BoardSide) captureAllStones(stones int) {
+func (side *BoardSide) captureAllStones(stones int64) {
 	side.Store += stones
 }
