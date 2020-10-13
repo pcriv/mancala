@@ -1,0 +1,13 @@
+wipe     = true
+no-tests = true
+no-hooks = true
+pkgname  = "dbschema"
+output   = "internal/pkg/dbschema"
+
+[psql]
+  dbname    = "mancala_dev"
+  host      = "localhost"
+  user      = "pcrivella"
+  port      = 5432
+  sslmode   = "disable"
+  blacklist = ["schema_migrations"]

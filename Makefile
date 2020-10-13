@@ -14,3 +14,9 @@ docs.build:
 
 docs.serve:
 	yarn redoc-cli serve $(API_SPEC) -w
+
+db.create:
+	dbmate create
+
+db.migrate: 
+	dbmate migrate

@@ -1,26 +1,30 @@
 package main
 
 import (
+	"log"
 	"os"
+
+	_ "github.com/lib/pq" // PostgreSQL driver
+	"github.com/xo/dburl"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pablocrivella/mancala/internal/games"
-	"github.com/pablocrivella/mancala/internal/infrastructure/persistence"
+	"github.com/pablocrivella/mancala/internal/infrastructure/postgres"
 	"github.com/pablocrivella/mancala/internal/restapi"
 	"github.com/pablocrivella/mancala/internal/restapi/resources"
 )
 
 func main() {
-	redisURL, ok := os.LookupEnv("REDIS_URL")
+	databaseURL, ok := os.LookupEnv("DATABASE_URL")
 	if !ok {
-		panic("missing env variable: REDIS_URL")
+		log.Fatal("missing env variable: DATABASE_URL")
 	}
-	redisClient, err := persistence.NewRedisClient(redisURL)
+	db, err := dburl.Open(databaseURL)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	gameRepo := persistence.NewGameRepo(redisClient)
+	gameRepo := postgres.NewGameRepo(db)
 
 	e := echo.New()
 	e.File("/", "website/public/index.html")
