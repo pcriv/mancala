@@ -88,7 +88,7 @@ func TestGamesResource_Update(t *testing.T) {
 			ctx.SetParamNames("id")
 			ctx.SetParamValues(tc.game.ID.String())
 
-			if assert.NoError(t, h.Update(ctx)) {
+			if assert.NoError(t, h.Update(ctx, tc.game.ID.String())) {
 				assert.Equal(t, tc.wantedCode, rc.Code)
 				assert.NotEmpty(t, strings.TrimSpace(rc.Body.String()))
 			}
@@ -133,7 +133,7 @@ func TestGamesResorce_Show(t *testing.T) {
 			ctx.SetParamNames("id")
 			ctx.SetParamValues(tc.game.ID.String())
 
-			if assert.NoError(t, h.Show(ctx)) {
+			if assert.NoError(t, h.Show(ctx, tc.game.ID.String())) {
 				assert.Equal(t, tc.watedCode, rc.Code)
 				assert.NotEmpty(t, strings.TrimSpace(rc.Body.String()))
 			}

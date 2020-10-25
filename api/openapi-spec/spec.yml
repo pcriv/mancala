@@ -6,7 +6,11 @@ info:
   license:
     name: MIT
 servers:
-  - url: https://mancala.herokuapp.com/v1/
+  - url: https://mancala.herokuapp.com/v1
+    description: "Production"
+  - url: http://localhost:1323/v1
+    description: "local"
+    asdsa: "sadsa"
 paths:
   /games:
     post:
@@ -57,7 +61,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ValidationErrors"
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 errors:
                   - "player1 can not be blank."
@@ -67,7 +71,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/InternalServerError"
+                $ref: "#/components/schemas/ErrorResponse"
 
   /games/{id}:
     parameters:
@@ -114,7 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/InternalServerError"
+                $ref: "#/components/schemas/ErrorResponse"
     patch:
       summary: Update game
       description: Updates a game by playing the corresponding next turn
@@ -133,9 +137,9 @@ paths:
               properties:
                 pit_index:
                   type: integer
+                  format: int64
                   minimum: 0
                   maximum: 5
-                  format: int32
 
       responses:
         "200":
@@ -168,7 +172,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ValidationErrors"
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 errors:
                   - "pit index is invalid."
@@ -178,12 +182,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/InternalServerError"
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   schemas:
     Result:
       type: integer
+      format: int64
       description:
         The result of the game. `0` = `Player1Wins`, `1` = `Player2Wins`, `2` = `Tie`, `3` = `Undefined`.
       enum:
@@ -193,6 +198,7 @@ components:
         - 3
     Turn:
       type: integer
+      format: int64
       description:
         The turn that needs to play next. `0` = `Player1`, `1` = `Player2`.
       enum:
@@ -200,6 +206,9 @@ components:
         - 1
     Player:
       type: object
+      required:
+        - name
+        - score
       properties:
         name:
           description: The name of the player
@@ -207,9 +216,13 @@ components:
         score:
           description: The score of the player
           type: integer
-          format: int32
+          format: int64
     BoardSide:
       type: object
+      required:
+        - pits
+        - store
+        - player
       description:
         A side of the board
       properties:
@@ -220,15 +233,22 @@ components:
           items:
             type: integer
             minimum: 0
-            format: int32
+            format: int64
         store:
           description: The store (big pit) of the board side
           type: integer
+          format: int64
         player:
           description: The player assigned to the board side
           $ref: "#/components/schemas/Player"
     Game:
       type: object
+      required:
+        - id
+        - turn
+        - result
+        - board_side1
+        - board_side2
       properties:
         id:
           description: The id of the game
@@ -245,7 +265,7 @@ components:
           allOf:
             - description: The lower side of the game board
             - $ref: "#/components/schemas/BoardSide"
-    ValidationErrors:
+    ErrorResponse:
       type: object
       required:
         - errors
@@ -254,17 +274,3 @@ components:
           type: array
           items:
             type: string
-    BadRequestError:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
-    InternalServerError:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
