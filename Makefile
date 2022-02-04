@@ -8,9 +8,3 @@ server:
 
 test:
 	go test ./...
-
-docs.build:
-	yarn redoc-cli bundle $(API_SPEC) -o website/public/index.html
-
-docs.serve:
-	yarn redoc-cli serve $(API_SPEC) -w
