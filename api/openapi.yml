@@ -7,7 +7,7 @@ info:
     name: MIT
 servers:
   - description: Production
-    url: https://mancala.herokuapp.com/v1/
+    url: https://go-mancala.herokuapp.com/v1/
   - description: Local
     url: v1/
 paths:
