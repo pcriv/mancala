@@ -1,4 +1,4 @@
-package resources
+package restapi
 
 import (
 	"net/http"
@@ -15,13 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGamesResource_Create(t *testing.T) {
+func TestGamesHandler_Create(t *testing.T) {
 	s, closeRedisFunc := startFakeRedisServer(t)
 	defer closeRedisFunc()
 
 	redisClient := newRedisClient(t, "redis://"+s.Addr())
 	gameRepo := persistence.NewGameRepo(redisClient)
-	h := GamesResource{GamesService: games.NewService(gameRepo)}
+	h := GamesHandler{GamesService: games.NewService(gameRepo)}
 	e := echo.New()
 
 	testCases := []struct {
@@ -50,60 +50,14 @@ func TestGamesResource_Create(t *testing.T) {
 	}
 }
 
-func TestGamesResource_Update(t *testing.T) {
+func TestGamesHandler_Show(t *testing.T) {
 	s, closeRedisFunc := startFakeRedisServer(t)
 	defer closeRedisFunc()
 
 	redisClient := newRedisClient(t, "redis://"+s.Addr())
 	gameRepo := persistence.NewGameRepo(redisClient)
 	gamesService := games.NewService(gameRepo)
-	h := GamesResource{GamesService: gamesService}
-	e := echo.New()
-	g, err := gamesService.CreateGame("Rick", "Morty")
-	if err != nil {
-		t.Fatalf("err: %s", err)
-	}
-
-	testCases := []struct {
-		name       string
-		game       engine.Game
-		body       string
-		wantedCode int
-	}{
-		{
-			name:       "",
-			game:       g,
-			body:       `{"pit_index": 0}`,
-			wantedCode: 200,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			rq := httptest.NewRequest(http.MethodPut, "/v1/games/:id", strings.NewReader(tc.body))
-			rq.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			rc := httptest.NewRecorder()
-			ctx := e.NewContext(rq, rc)
-			ctx.SetPath("/v1/games/:id")
-			ctx.SetParamNames("id")
-			ctx.SetParamValues(tc.game.ID.String())
-
-			if assert.NoError(t, h.Update(ctx)) {
-				assert.Equal(t, tc.wantedCode, rc.Code)
-				assert.NotEmpty(t, strings.TrimSpace(rc.Body.String()))
-			}
-		})
-	}
-}
-
-func TestGamesResorce_Show(t *testing.T) {
-	s, closeRedisFunc := startFakeRedisServer(t)
-	defer closeRedisFunc()
-
-	redisClient := newRedisClient(t, "redis://"+s.Addr())
-	gameRepo := persistence.NewGameRepo(redisClient)
-	gamesService := games.NewService(gameRepo)
-	h := GamesResource{GamesService: gamesService}
+	h := GamesHandler{GamesService: gamesService}
 	g, err := gamesService.CreateGame("Rick", "Morty")
 	if err != nil {
 		t.Fatalf("err: %s", err)
@@ -133,7 +87,7 @@ func TestGamesResorce_Show(t *testing.T) {
 			ctx.SetParamNames("id")
 			ctx.SetParamValues(tc.game.ID.String())
 
-			if assert.NoError(t, h.Show(ctx)) {
+			if assert.NoError(t, h.Show(ctx, tc.game.ID.String())) {
 				assert.Equal(t, tc.watedCode, rc.Code)
 				assert.NotEmpty(t, strings.TrimSpace(rc.Body.String()))
 			}

@@ -10,3 +10,6 @@
 .vscode/
 /node_modules/
 NOTES.md
+.build/
+internal/openapi/
+.DS_Store

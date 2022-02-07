@@ -1,0 +1,279 @@
+---
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title:  Mancala API
+  license:
+    name: MIT
+servers:
+  - description: Production
+    url: https://mancala.herokuapp.com/v1/
+  - description: Local
+    url: v1/
+paths:
+  /games:
+    post:
+      summary: Create game
+      operationId: CreateGame
+      tags:
+        - Games
+      requestBody:
+        $ref: "#/components/requestBodies/NewGameBody"
+      responses:
+        "201":
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+              example:
+                $ref: "#/components/examples/GameExample"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /games/{id}:
+    parameters:
+      - $ref: "#/components/parameters/GameID"
+    get:
+      summary: Show game
+      description: Retrieves a game
+      operationId: ShowGame
+      tags:
+        - Games
+      responses:
+        "200":
+          description: Game
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+              example:
+                $ref: "#/components/examples/GameExample"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /games/{id}/plays:
+    parameters:
+      - $ref: "#/components/parameters/GameID"
+    post:
+      summary: Perform next play
+      description: Updates a game by playing the corresponding next turn
+      operationId: CreatePlay
+      tags:
+        - Games
+      requestBody:
+        $ref: "#/components/requestBodies/NewPlayBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/PlayCreated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  parameters:
+    GameID:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBodies:
+    NewGameBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - player1
+              - player2
+            properties:
+              player1:
+                type: string
+              player2:
+                type: string
+    NewPlayBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            required:
+              - pit_index
+            properties:
+              pit_index:
+                type: integer
+                minimum: 0
+                maximum: 5
+                format: int64
+  responses:
+    PlayCreated:
+      description: Play created
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - game
+              - played_pit_index
+            properties:
+              played_pit_index:
+                type: integer
+                minimum: 0
+                maximum: 5
+                format: int64
+              game:
+                $ref: "#/components/schemas/Game"
+          examples:
+            Play:
+              $ref: "#/components/examples/PlayExample"
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: The request was invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  examples:
+    PlayExample:
+      value:
+        played_pit_index: 5
+        game:
+          id: "37d5b35c-f90e-4136-90f8-500d6c43b1bf"
+          turn: 0
+          result: 3
+          board_side1:
+            pits: [0, 7, 7, 7, 7, 7]
+            store: 1
+            player:
+              name: Player1
+              score: 0
+          board_side2:
+            pits: [6, 6, 6, 6, 6, 6]
+            store: 0
+            player:
+              name: Player2
+              score: 0
+    GameExample:
+      value:
+        id: "37d5b35c-f90e-4136-90f8-500d6c43b1bf"
+        turn: 0
+        result: 4
+        board_side1:
+          pits: [6, 6, 6, 6, 6, 6]
+          store: 0
+          player:
+            name: Player1
+            score: 0
+        board_side2:
+          pits: [6, 6, 6, 6, 6, 6]
+          store: 0
+          player:
+            name: Player2
+            score: 0
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - code
+        - message
+    Result:
+      type: integer
+      description: >
+        The result of the game.
+        0 => Undefined
+        1 => Player1Wins
+        2 => Player2Wins
+        3 => Tie
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+    Turn:
+      type: integer
+      description:
+        The turn that needs to play next.
+        0 => Player1
+        1 => Player2
+      enum:
+        - 0
+        - 1
+    Player:
+      type: object
+      required:
+        - name
+        - score
+      properties:
+        name:
+          description: The name of the player
+          type: string
+        score:
+          description: The score of the player
+          type: integer
+          format: int64
+    BoardSide:
+      type: object
+      description:
+        A side of the board
+      required:
+        - pits
+        - store
+        - player
+      properties:
+        pits:
+          description: The pits of the board side
+          type: array
+          maxItems: 6
+          items:
+            type: integer
+            minimum: 0
+            format: int64
+        store:
+          description: The store (big pit) of the board side
+          type: integer
+          format: int64
+        player:
+          $ref: "#/components/schemas/Player"
+    Game:
+      type: object
+      required:
+        - id
+        - result
+        - turn
+        - board_side1
+        - board_side2
+      properties:
+        id:
+          description: The id of the game
+          type: string
+        result:
+          $ref: "#/components/schemas/Result"
+        turn:
+          $ref: "#/components/schemas/Turn"
+        board_side1:
+          $ref: "#/components/schemas/BoardSide"
+        board_side2:
+          $ref: "#/components/schemas/BoardSide"

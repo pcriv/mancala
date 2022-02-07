@@ -1,43 +1,44 @@
 package main
 
 import (
+	"errors"
 	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pablocrivella/mancala/internal/games"
 	"github.com/pablocrivella/mancala/internal/infrastructure/persistence"
+	"github.com/pablocrivella/mancala/internal/openapi"
 	"github.com/pablocrivella/mancala/internal/restapi"
-	"github.com/pablocrivella/mancala/internal/restapi/resources"
 )
 
 func main() {
+	err := run()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func run() error {
 	redisURL, ok := os.LookupEnv("REDIS_URL")
 	if !ok {
-		panic("missing env variable: REDIS_URL")
+		return errors.New("missing env variable: REDIS_URL")
 	}
 	redisClient, err := persistence.NewRedisClient(redisURL)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	gameRepo := persistence.NewGameRepo(redisClient)
 
 	e := echo.New()
-	e.File("/", "website/public/index.html")
-
+	e.File("/docs", "website/public/index.html")
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
 
-	r := restapi.Resources{
-		Games: resources.GamesResource{
-			GamesService: games.NewService(gameRepo),
-		},
-	}
-	v1 := e.Group("/v1")
-	v1.GET("/games/:id", r.Games.Show)
-	v1.POST("/games", r.Games.Create)
-	v1.PATCH("/games/:id", r.Games.Update)
+	s := restapi.NewServer(games.NewService(gameRepo))
+	e.GET("swagger.json", s.ShowSwaggerSpec)
+	openapi.RegisterHandlers(e.Group("/v1"), &s)
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
@@ -45,4 +46,6 @@ func main() {
 	}
 
 	e.Logger.Fatal(e.Start(":" + port))
+
+	return nil
 }
