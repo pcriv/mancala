@@ -1,1 +1,0 @@
-release: make generate.api
