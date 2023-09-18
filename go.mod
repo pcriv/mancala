@@ -1,8 +1,6 @@
 module github.com/pablocrivella/mancala
 
-// +heroku goVersion go1.17
-
-go 1.17
+go 1.21.1
 
 require (
 	github.com/alicebob/miniredis/v2 v2.30.5
