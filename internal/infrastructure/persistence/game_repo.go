@@ -10,12 +10,10 @@ import (
 	"github.com/pablocrivella/mancala/internal/engine"
 )
 
-type (
-	// GameRepo is a redis backed game repo.
-	GameRepo struct {
-		db *redis.Client
-	}
-)
+// GameRepo is a redis backed game repo.
+type GameRepo struct {
+	db *redis.Client
+}
 
 // NewGameRepo creates a new GameRepo.
 func NewGameRepo(client *redis.Client) GameRepo {
@@ -40,7 +38,7 @@ func (r GameRepo) Find(id string) (engine.Game, error) {
 	var g engine.Game
 	val, err := r.db.Get(context.Background(), id).Result()
 	if err != nil {
-		return g, &NotFoundError{Msg: fmt.Sprintf("cannot find game with id %v", id)}
+		return g, fmt.Errorf("%w: cannot find game with id %v", err, id)
 	}
 	err = json.Unmarshal([]byte(val), &g)
 	if err != nil {

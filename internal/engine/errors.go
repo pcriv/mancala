@@ -1,12 +1,8 @@
 package engine
 
-import "fmt"
+import (
+	"errors"
+)
 
-// InvalidPlayError represents an invalid play error.
-type InvalidPlayError struct {
-	Msg string
-}
-
-func (e *InvalidPlayError) Error() string {
-	return fmt.Sprintf("invalid play: %v", e.Msg)
-}
+// ErrInvalidPlay represents an invalid play error.
+var ErrInvalidPlay = errors.New("invalid play")

@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -42,11 +43,11 @@ func (h GamesHandler) Create(c echo.Context) error {
 func (h GamesHandler) Show(c echo.Context, id string) error {
 	g, err := h.GamesService.FindGame(id)
 	if err != nil {
-		switch e := err.(type) {
-		case *persistence.NotFoundError:
+		switch {
+		case errors.Is(err, persistence.ErrNotFound):
 			return echo.NewHTTPError(http.StatusNotFound)
 		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, e.Error())
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
 	}
 

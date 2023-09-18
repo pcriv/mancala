@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -26,13 +27,13 @@ func (h PlaysHandler) Create(c echo.Context, gameID string) error {
 
 	g, err := h.GamesService.ExecutePlay(gameID, b.PitIndex)
 	if err != nil {
-		switch e := err.(type) {
-		case *persistence.NotFoundError:
+		switch {
+		case errors.Is(err, persistence.ErrNotFound):
 			return echo.NewHTTPError(http.StatusNotFound)
-		case *engine.InvalidPlayError:
-			return echo.NewHTTPError(http.StatusUnprocessableEntity, e)
+		case errors.Is(err, engine.ErrInvalidPlay):
+			return echo.NewHTTPError(http.StatusUnprocessableEntity, err)
 		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, e)
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
 	}
 	return c.JSON(http.StatusOK, openapi.PlayCreated{
