@@ -8,7 +8,7 @@ require (
 	github.com/alicebob/miniredis/v2 v2.18.0
 	github.com/deepmap/oapi-codegen v1.9.1
 	github.com/getkin/kin-openapi v0.89.0
-	github.com/go-redis/redis/v8 v8.11.4
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.3.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/stretchr/testify v1.8.4
