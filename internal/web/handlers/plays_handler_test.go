@@ -1,16 +1,18 @@
-package restapi
+package handlers
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pablocrivella/mancala/internal/engine"
-	"github.com/pablocrivella/mancala/internal/games"
-	"github.com/pablocrivella/mancala/internal/infrastructure/persistence"
+	"github.com/pablocrivella/mancala/internal/core"
+	"github.com/pablocrivella/mancala/internal/service"
 	"github.com/stretchr/testify/assert"
+
+	redisstore "github.com/pablocrivella/mancala/internal/store/redis"
 )
 
 func TestPlaysHandler_Create(t *testing.T) {
@@ -18,18 +20,18 @@ func TestPlaysHandler_Create(t *testing.T) {
 	defer closeRedisFunc()
 
 	redisClient := newRedisClient(t, "redis://"+s.Addr())
-	gameRepo := persistence.NewGameRepo(redisClient)
-	gamesService := games.NewService(gameRepo)
-	h := PlaysHandler{GamesService: gamesService}
+	gameStore := redisstore.NewGameStore(redisClient)
+	gameService := service.NewGameService(gameStore)
+	h := PlaysHandler{GameService: gameService}
 	e := echo.New()
-	g, err := gamesService.CreateGame("Rick", "Morty")
+	g, err := gameService.CreateGame(context.Background(), "Rick", "Morty")
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
 
 	testCases := []struct {
 		name       string
-		game       engine.Game
+		game       core.Game
 		body       string
 		wantedCode int
 	}{

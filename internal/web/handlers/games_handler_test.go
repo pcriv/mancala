@@ -1,18 +1,20 @@
-package restapi
+package handlers
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
-	"github.com/pablocrivella/mancala/internal/engine"
-	"github.com/pablocrivella/mancala/internal/games"
-	"github.com/pablocrivella/mancala/internal/infrastructure/persistence"
+	"github.com/pablocrivella/mancala/internal/core"
+	"github.com/pablocrivella/mancala/internal/service"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
+
+	redisstore "github.com/pablocrivella/mancala/internal/store/redis"
 )
 
 func TestGamesHandler_Create(t *testing.T) {
@@ -20,8 +22,9 @@ func TestGamesHandler_Create(t *testing.T) {
 	defer closeRedisFunc()
 
 	redisClient := newRedisClient(t, "redis://"+s.Addr())
-	gameRepo := persistence.NewGameRepo(redisClient)
-	h := GamesHandler{GamesService: games.NewService(gameRepo)}
+	gameStore := redisstore.NewGameStore(redisClient)
+	gameService := service.NewGameService(gameStore)
+	h := GamesHandler{GameService: gameService}
 	e := echo.New()
 
 	testCases := []struct {
@@ -55,10 +58,11 @@ func TestGamesHandler_Show(t *testing.T) {
 	defer closeRedisFunc()
 
 	redisClient := newRedisClient(t, "redis://"+s.Addr())
-	gameRepo := persistence.NewGameRepo(redisClient)
-	gamesService := games.NewService(gameRepo)
-	h := GamesHandler{GamesService: gamesService}
-	g, err := gamesService.CreateGame("Rick", "Morty")
+	gameStore := redisstore.NewGameStore(redisClient)
+	gameService := service.NewGameService(gameStore)
+	h := GamesHandler{GameService: gameService}
+
+	g, err := gameService.CreateGame(context.Background(), "Rick", "Morty")
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -66,7 +70,7 @@ func TestGamesHandler_Show(t *testing.T) {
 
 	testCases := []struct {
 		name      string
-		game      engine.Game
+		game      core.Game
 		body      string
 		watedCode int
 	}{
@@ -104,9 +108,18 @@ func startFakeRedisServer(t *testing.T) (*miniredis.Miniredis, func()) {
 }
 
 func newRedisClient(t *testing.T, url string) *redis.Client {
-	c, err := persistence.NewRedisClient(url)
+	options, err := redis.ParseURL(url)
 	if err != nil {
-		t.Fatalf("err: %s", err)
+		if err != nil {
+			t.Fatalf("err: %s", err)
+		}
 	}
-	return c
+	client := redis.NewClient(options)
+	_, err = client.Ping(context.Background()).Result()
+	if err != nil {
+		if err != nil {
+			t.Fatalf("err: %s", err)
+		}
+	}
+	return client
 }
