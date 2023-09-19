@@ -6,7 +6,6 @@ import (
 	"github.com/pablocrivella/mancala/internal/core"
 )
 
-// Service is a games context domain service
 type GameService struct {
 	gameStore core.GameStore
 }
