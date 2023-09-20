@@ -1,6 +1,8 @@
 package inmemory
 
 import (
+	"context"
+
 	"github.com/pablocrivella/mancala/internal/core"
 )
 
@@ -18,7 +20,12 @@ func NewGameStore(games ...core.Game) GameStore {
 }
 
 // Find returns a game with the given id.
-func (r GameStore) Find(id string) (core.Game, error) {
+func (r GameStore) Find(ctx context.Context, id string) (core.Game, error) {
+	select {
+	case <-ctx.Done():
+		return core.Game{}, ctx.Err()
+	default:
+	}
 	g, ok := r.db[id]
 	if ok {
 		return g, nil
@@ -27,7 +34,12 @@ func (r GameStore) Find(id string) (core.Game, error) {
 }
 
 // Save persists a game to the in-memory db.
-func (r GameStore) Save(g core.Game) error {
+func (r GameStore) Save(ctx context.Context, g core.Game) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
 	r.db[g.ID.String()] = g
 	return nil
 }

@@ -26,11 +26,11 @@ func (s API) CreateGame(ctx echo.Context) error {
 }
 
 func (s API) ShowGame(ctx echo.Context, id openapi.GameID) error {
-	return s.Games.Show(ctx, string(id))
+	return s.Games.Show(ctx, id)
 }
 
 func (s API) CreatePlay(ctx echo.Context, id openapi.GameID) error {
-	return s.Plays.Create(ctx, string(id))
+	return s.Plays.Create(ctx, id)
 }
 
 func (s API) ShowSwaggerSpec(ctx echo.Context) error {
