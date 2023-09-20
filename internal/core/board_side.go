@@ -10,8 +10,10 @@ type (
 	}
 )
 
-var fullSidePits = pitsArray{6, 6, 6, 6, 6, 6}
-var emptySidePits = pitsArray{}
+var (
+	fullSidePits  = pitsArray{6, 6, 6, 6, 6, 6}
+	emptySidePits = pitsArray{}
+)
 
 func (side *BoardSide) setup(playerName string) {
 	side.Player.Name = playerName

@@ -6,8 +6,6 @@ info:
   license:
     name: MIT
 servers:
-  - description: Production
-    url: https://go-mancala.herokuapp.com/v1/
   - description: Local
     url: v1/
 paths:
@@ -83,7 +81,6 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
   requestBodies:
     NewGameBody:
       required: true

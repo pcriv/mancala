@@ -1,0 +1,16 @@
+---
+pre-commit:
+  skip:
+    - merge
+    - rebase
+  commands:
+    go:
+      glob: "*.go" # glob filter
+      exclude: vendor/ # regexp filter
+      run: make lint.go
+      stage_fixed: true
+
+    yaml:
+      run: make lint.yml
+      stage_fixed: true
+      glob: "*.{yaml,yml}" # glob filter

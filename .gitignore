@@ -9,6 +9,7 @@
 /Godeps/
 .vscode/
 /node_modules/
+/coverage/
 NOTES.md
 .build/
 .DS_Store

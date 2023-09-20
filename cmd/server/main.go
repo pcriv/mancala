@@ -35,9 +35,11 @@ func run() error {
 
 	e := echo.New()
 	e.File("/docs", "website/public/index.html")
+
+	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
+	e.Use(middleware.Recover())
 
 	s := web.NewAPI(service.NewGameService(gameStore))
 	e.GET("swagger.json", s.ShowSwaggerSpec)

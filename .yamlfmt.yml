@@ -1,0 +1,7 @@
+---
+doublestar: true
+exclude:
+  - "./vendor/**/*"
+formatter:
+  include_document_start: true
+  retain_line_breaks: true
