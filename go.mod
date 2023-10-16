@@ -3,7 +3,7 @@ module github.com/pablocrivella/mancala
 go 1.21
 
 require (
-	github.com/alicebob/miniredis/v2 v2.30.5
+	github.com/alicebob/miniredis/v2 v2.31.0
 	github.com/getkin/kin-openapi v0.120.0
 	github.com/google/uuid v1.3.1
 	github.com/labstack/echo/v4 v4.11.1
