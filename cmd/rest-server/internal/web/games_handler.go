@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 
-
 	"github.com/pcriv/mancala/cmd/rest-server/internal/openapimap"
 
 	"github.com/labstack/echo/v4"
