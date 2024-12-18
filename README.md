@@ -8,7 +8,7 @@ To run the server locally run the following command:
 
 ```sh
 make setup
-make local.run
+make rest-server
 ```
 
 Once you have the server running.
@@ -30,7 +30,7 @@ curl localhost:1323/v1/games/:id
 To perform the next play:
 
 ```bash
-curl -X PATCH localhost:1323/v1/games/:id -H "Content-Type: application/json" --data '{"pit_index":0}'
+curl -X POST localhost:1323/v1/games/:id/plays -H "Content-Type: application/json" --data '{"pit_index":0}'
 ```
 
 ### Notes
