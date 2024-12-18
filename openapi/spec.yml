@@ -7,9 +7,37 @@ info:
     name: MIT
 servers:
   - description: Local
-    url: v1/
+    url: http://localhost:1323
 paths:
-  /games:
+  /docs:
+    get:
+      summary: Render API docs page
+      operationId: RenderDocs
+      tags:
+        - Docs
+      responses:
+        "200":
+          description: API documentation
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+  /swagger.json:
+    get:
+        summary: Render swagger JSON
+        operationId: RenderSwagger
+        tags:
+          - Docs
+        responses:
+          "200":
+            description: Swagger JSON
+            content:
+              application/json:
+                schema:
+                  type: object
+                  additionalProperties: true
+  /v1/games:
     post:
       summary: Create game
       operationId: CreateGame
@@ -30,7 +58,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /games/{id}:
+  /v1/games/{id}:
     parameters:
       - $ref: "#/components/parameters/GameID"
     get:
@@ -52,7 +80,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /games/{id}/plays:
+  /v1/games/{id}/plays:
     parameters:
       - $ref: "#/components/parameters/GameID"
     post:
@@ -94,8 +122,10 @@ components:
             properties:
               player1:
                 type: string
+                minLength: 1
               player2:
                 type: string
+                minLength: 1
     NewPlayBody:
       required: true
       content:
@@ -156,8 +186,8 @@ components:
         played_pit_index: 5
         game:
           id: "37d5b35c-f90e-4136-90f8-500d6c43b1bf"
-          turn: 0
-          result: 3
+          turn: Player1
+          result: Player1Wins
           board_side1:
             pits: [0, 7, 7, 7, 7, 7]
             store: 1
@@ -173,8 +203,8 @@ components:
     GameExample:
       value:
         id: "37d5b35c-f90e-4136-90f8-500d6c43b1bf"
-        turn: 0
-        result: 4
+        turn: Player1
+        result: Tie
         board_side1:
           pits: [6, 6, 6, 6, 6, 6]
           store: 0
@@ -197,27 +227,19 @@ components:
         - code
         - message
     Result:
-      type: integer
-      description: >
-        The result of the game.
-        0 => Undefined
-        1 => Player1Wins
-        2 => Player2Wins
-        3 => Tie
+      type: string
+      description: The result of the game
       enum:
-        - 0
-        - 1
-        - 2
-        - 3
+        - Undefined
+        - Player1Wins
+        - Player2Wins
+        - Tie
     Turn:
-      type: integer
-      description:
-        The turn that needs to play next.
-        0 => Player1
-        1 => Player2
+      type: string
+      description: The turn that needs to play next
       enum:
-        - 0
-        - 1
+        - TurnPlayer1
+        - TurnPlayer2
     Player:
       type: object
       required:

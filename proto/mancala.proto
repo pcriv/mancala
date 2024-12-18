@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package mancala;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/pcriv/mancala/proto";
+
+service Service {
+	rpc CreateGame(CreateGameRequest) returns (CreateGameResponse);
+  rpc FindGame(FindGameRequest) returns (FindGameResponse);
+  rpc ExecutePlay(ExecutePlayRequest) returns (ExecutePlayResponse);
+}
+
+enum Turn {
+  TURN_UNSPECIFIED = 0;
+  TURN_PLAYER1 = 1;
+  TURN_PLAYER2 = 2;
+}
+
+enum Result {
+  RESULT_UNSPECIFIED = 0;
+  RESULT_PLAYER1_WINS = 1;
+  RESULT_PLAYER2_WINS = 2;
+  RESULT_TIE = 3;
+}
+
+message CreateGameRequest {
+  string player1 = 1 [(buf.validate.field).string.min_len = 1];
+  string player2 = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message CreateGameResponse {
+	Game created_game = 1;
+}
+
+message FindGameRequest {
+  string id = 1;
+}
+
+message FindGameResponse {
+  Game game = 1;
+}
+
+message ExecutePlayRequest {
+  string game_id = 1 [(buf.validate.field).string.min_len = 1];
+  int64 pit_index = 2  [(buf.validate.field).int64 = { gte: 0, lt: 6 }];
+}
+
+message ExecutePlayResponse {
+  int64 played_pit_index = 1;
+  Game game = 2;
+}
+
+message Game {
+  string id = 1;
+  Turn turn = 2;
+  Result result = 3;
+  BoardSide board_side1 = 4;
+  BoardSide board_side2 = 5;
+}
+
+message BoardSide {
+  repeated int64 pits = 1;
+  int64 store = 2;
+  Player player = 3;
+}
+
+message Player {
+  string name = 1;
+  int64 score = 2;
+}

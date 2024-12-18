@@ -1,10 +1,4 @@
 ---
-run:
-  modules-download-mode: vendor
-
-output:
-  format: colored-line-number
-
 linters:
   disable-all: true
   enable:

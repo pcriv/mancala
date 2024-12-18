@@ -7,11 +7,6 @@ THIS_MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
 export GOOS ?= $(shell go env GOOS)
 export GOARCH ?= $(shell go env GOARCH)
 
-# Ensure CI var is empty if false - this makes it easier to do conditionals
-ifeq ($(CI),false)
-CI :=
-endif
-
 ##@ General
 
 ## Print this help message
@@ -46,20 +41,20 @@ clean:
 	rm -rf tools/
 
 ## Setup local environment
-setup: deps githooks .env .env.test
+setup: deps git-hooks .env .env.test
 
 ## Install git hooks
-githooks:
+git-hooks:
 	lefthook install
 
 ## Install dependencies
 deps:
-	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
 	go install github.com/joho/godotenv/cmd/godotenv@latest
-	go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+	go install gotest.tools/gotestsum@latest
 	go install github.com/evilmartians/lefthook@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+
 
 ##@ Build
 
@@ -71,12 +66,14 @@ build:
 
 ## Run tests
 test:
-	godotenv -f .env.test go test -v -mod=vendor -cover -json ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+	godotenv -f .env.test gotestsum --format=testdox -- -cover ./...
 
 ## Run tests with coverage
 test.coverage:
 	mkdir -p ./coverage
-	godotenv -f .env.test go test -v -mod=vendor -json ./... -covermode=count -coverpkg=./... -coverprofile coverage/coverage.out | gotestfmt
+	godotenv -f .env.test gotestsum --format=testdox -- -covermode=count -coverpkg=./... -coverprofile coverage/coverage.out ./...
+	grep -v -E -f .covignore ./coverage/coverage.out > ./coverage/coverage.filtered.out
+	mv ./coverage/coverage.filtered.out ./coverage/coverage.out
 	go tool cover -func coverage/coverage.out -o coverage/coverage.tool
 	go tool cover -html coverage/coverage.out -o coverage/coverage.html
 
@@ -94,13 +91,21 @@ lint.go:
 ## Lint yaml files
 # Autofix is disabled if CI is set
 lint.yml:
-	yamlfmt -conf .yamlfmt.yml $(if $(CI),-lint -dry) '.github/**/*{.yaml,yml}' '*.{yml,yaml}'
+	yamlfmt -conf .yamlfmt.yml
 
 ##@ Local Development
 
-## Run locally
-local.run:
-	godotenv -f .env go run cmd/server/main.go
+## Run grpc-server
+grpc-server:
+	godotenv -f .env go run ./cmd/grpc-server/
+
+## Run connect-server
+connect-server:
+	godotenv -f .env go run ./cmd/connect-server/
+
+## Run rest-server
+rest-server:
+	godotenv -f .env go run ./cmd/rest-server/
 
 # Ensures .env exists
 .env:
@@ -114,10 +119,9 @@ local.run:
 
 ##@ Code Generation
 
-## Generate sources from OpenAPI spec
-gen.openapi:
-	oapi-codegen -generate types -package openapi -o internal/web/openapi/types.gen.go openapi/spec.yml
-	oapi-codegen -generate server -package openapi -o internal/web/openapi/server.gen.go openapi/spec.yml
-	oapi-codegen -generate spec -package openapi -o internal/web/openapi/spec.gen.go openapi/spec.yml
+## Generate code
+gen:
+	go generate ./...
+	buf generate proto/
 
 .PRECIOUS: .env .env.test
