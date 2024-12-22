@@ -22,7 +22,10 @@ const (
 	Tie Result = "Tie"
 )
 
-const pitsPerSide int64 = 6
+const (
+	pitsPerSide  int64 = 6
+	stonesPerPit int64 = 6
+)
 
 type (
 	// Game represents a Mancala game.

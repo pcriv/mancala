@@ -37,8 +37,6 @@ help:
 ## Clean all caches and intermediates
 clean:
 	go clean -i
-	rm -rf vendor/
-	rm -rf tools/
 
 ## Setup local environment
 setup: deps git-hooks .env .env.test

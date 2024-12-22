@@ -11,9 +11,16 @@ type (
 )
 
 var (
-	fullSidePits  = pitsArray{6, 6, 6, 6, 6, 6}
+	fullSidePits  = fillPits(pitsArray{}, stonesPerPit)
 	emptySidePits = pitsArray{}
 )
+
+func fillPits(pits pitsArray, stones int64) pitsArray {
+	for i := range pits {
+		pits[i] = stones
+	}
+	return pits
+}
 
 func (side *BoardSide) setup(playerName string) {
 	side.Player.Name = playerName
