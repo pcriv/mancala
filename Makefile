@@ -63,7 +63,7 @@ build:
 ##@ Testing
 
 ## Run tests
-test:
+test: .env.test
 	godotenv -f .env.test gotestsum --format=testdox -- -cover ./...
 
 ## Run tests with coverage
