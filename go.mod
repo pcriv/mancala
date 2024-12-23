@@ -7,7 +7,7 @@ require (
 	connectrpc.com/connect v1.17.0
 	github.com/alicebob/miniredis/v2 v2.33.0
 	github.com/bufbuild/protovalidate-go v0.8.0
-	github.com/caarlos0/env/v11 v11.3.0
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/google/uuid v1.6.0
 	github.com/labstack/echo/v4 v4.13.2
