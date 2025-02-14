@@ -5,7 +5,7 @@ go 1.23
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.0-20241127180247-a33202765966.1
 	connectrpc.com/connect v1.17.0
-	github.com/alicebob/miniredis/v2 v2.33.0
+	github.com/alicebob/miniredis/v2 v2.34.0
 	github.com/bufbuild/protovalidate-go v0.8.0
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/getkin/kin-openapi v0.128.0
@@ -25,7 +25,7 @@ require (
 
 require (
 	cel.dev/expr v0.19.0 // indirect
-	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
+	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
