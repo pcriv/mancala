@@ -10,14 +10,14 @@ require (
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/google/uuid v1.6.0
-	github.com/labstack/echo/v4 v4.13.2
+	github.com/labstack/echo/v4 v4.13.3
 	github.com/oapi-codegen/echo-middleware v1.0.2
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/samber/slog-echo v1.14.7
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/net v0.32.0
+	golang.org/x/net v0.33.0
 	golang.org/x/sync v0.10.0
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.0
