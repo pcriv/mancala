@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.0-20241127180247-a33202765966.1
-	connectrpc.com/connect v1.17.0
+	connectrpc.com/connect v1.18.1
 	github.com/alicebob/miniredis/v2 v2.34.0
 	github.com/bufbuild/protovalidate-go v0.8.0
 	github.com/caarlos0/env/v11 v11.3.1
