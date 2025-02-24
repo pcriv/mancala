@@ -3,7 +3,7 @@ module github.com/pcriv/mancala
 go 1.23
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.0-20241127180247-a33202765966.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20250219170025-d39267d9df8f.1
 	connectrpc.com/connect v1.17.0
 	github.com/alicebob/miniredis/v2 v2.34.0
 	github.com/bufbuild/protovalidate-go v0.8.0
@@ -20,7 +20,7 @@ require (
 	golang.org/x/net v0.35.0
 	golang.org/x/sync v0.11.0
 	google.golang.org/grpc v1.70.0
-	google.golang.org/protobuf v1.36.0
+	google.golang.org/protobuf v1.36.5
 )
 
 require (
