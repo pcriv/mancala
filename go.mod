@@ -15,7 +15,7 @@ require (
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/redis/go-redis/v9 v9.7.0
-	github.com/samber/slog-echo v1.14.7
+	github.com/samber/slog-echo v1.16.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.35.0
 	golang.org/x/sync v0.11.0
@@ -48,7 +48,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
-	github.com/samber/lo v1.38.1 // indirect
+	github.com/samber/lo v1.49.1 // indirect
 	github.com/speakeasy-api/openapi-overlay v0.9.0 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
