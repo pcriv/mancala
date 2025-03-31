@@ -20,7 +20,7 @@ require (
 	golang.org/x/net v0.35.0
 	golang.org/x/sync v0.11.0
 	google.golang.org/grpc v1.70.0
-	google.golang.org/protobuf v1.36.0
+	google.golang.org/protobuf v1.36.6
 )
 
 require (
