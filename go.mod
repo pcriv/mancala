@@ -14,7 +14,7 @@ require (
 	github.com/oapi-codegen/echo-middleware v1.0.2
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.8.0
 	github.com/samber/slog-echo v1.14.7
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.35.0
