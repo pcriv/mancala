@@ -1,6 +1,6 @@
 module github.com/pcriv/mancala
 
-go 1.24.1
+go 1.25.7
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.9-20250912141014-52f32327d4b0.1
