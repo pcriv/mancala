@@ -10,36 +10,36 @@ import (
 	"github.com/caarlos0/env/v11"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/pcriv/mancala/cmd/rest-server/internal/web"
-	"github.com/pcriv/mancala/internal/mancala"
-	"github.com/pcriv/mancala/internal/openapi"
+	oapicodegenmiddleware "github.com/oapi-codegen/echo-middleware"
 	"github.com/redis/go-redis/v9"
+	slogecho "github.com/samber/slog-echo"
 	"golang.org/x/sync/errgroup"
 
-	oapicodegenmiddleware "github.com/oapi-codegen/echo-middleware"
+	"github.com/pcriv/mancala/cmd/restapi/server"
+	"github.com/pcriv/mancala/internal/mancala"
+	"github.com/pcriv/mancala/internal/openapi"
 	redisstore "github.com/pcriv/mancala/internal/store/redis"
-	slogecho "github.com/samber/slog-echo"
 )
 
 type envConfig struct {
-	Env      string `env:"ENV" envDefault:"local"`
-	LogLevel string `env:"LOG_LEVEL" envDefault:"debug"`
+	Env      string `env:"ENV"                envDefault:"local"`
+	LogLevel string `env:"LOG_LEVEL"          envDefault:"debug"`
 	RedisURL string `env:"REDIS_URL,required"`
-	Port     string `env:"PORT" envDefault:"1323"`
+	Port     string `env:"PORT"               envDefault:"1323"`
 }
 
 func main() {
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	defer cancel()
-
-	err := run(ctx)
+	err := run()
 	if err != nil {
 		slog.Error("failed to start server", slog.Any("err", err))
 		os.Exit(1)
 	}
 }
 
-func run(ctx context.Context) error {
+func run() error {
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
+	defer cancel()
+
 	cfg := envConfig{}
 	if err := env.Parse(&cfg); err != nil {
 		return fmt.Errorf("unable to parse config: %w", err)
@@ -75,21 +75,20 @@ func run(ctx context.Context) error {
 	e.Use(oapicodegenmiddleware.OapiRequestValidatorWithOptions(spec, &options))
 	e.Use(middleware.Recover())
 
-	s := web.NewAPI(spec, mancala.NewService(gameStore))
+	s := server.NewAPI(spec, mancala.NewService(gameStore))
 	openapi.RegisterHandlers(e, s)
 
-	eg, ctx := errgroup.WithContext(ctx)
-
-	eg.Go(func() error {
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(func() error {
 		return e.Start(":" + cfg.Port)
 	})
 
-	eg.Go(func() error {
+	g.Go(func() error {
 		<-ctx.Done()
 		return e.Shutdown(context.Background())
 	})
 
-	return eg.Wait()
+	return g.Wait()
 }
 
 func newRedisClient(ctx context.Context, url string) (*redis.Client, error) {

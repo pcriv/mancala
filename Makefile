@@ -1,5 +1,5 @@
 SERVICE:=mancala
-BUILD_OPTS:=-ldflags="-s -w" -mod=vendor
+BUILD_OPTS:=-ldflags="-s -w"
 
 # Absolute path to this makefile
 THIS_MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -39,37 +39,33 @@ clean:
 	go clean -i
 
 ## Setup local environment
-setup: deps git-hooks .env .env.test
-
-## Install git hooks
-git-hooks:
-	lefthook install
+setup: deps-macos .env .env.test
 
 ## Install dependencies
-deps:
-	go install github.com/joho/godotenv/cmd/godotenv@latest
-	go install gotest.tools/gotestsum@latest
-	go install github.com/evilmartians/lefthook@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+deps-macos:
+	brew install dbmate
+	brew install golangci-lint
+	brew install mockery
+	brew install yamlfmt
 
 
 ##@ Build
 
 ## Build for local platform
 build:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_OPTS) -o $(SERVICE) main.go
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_OPTS) -o bin/$(SERVICE)-connectrpc ./cmd/connectrpc/
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_OPTS) -o bin/$(SERVICE)-restapi ./cmd/restapi/
 
 ##@ Testing
 
 ## Run tests
 test: .env.test
-	godotenv -f .env.test gotestsum --format=testdox -- -cover ./...
+	go tool godotenv -f .env.test go tool gotestsum --format=testdox -- -cover ./...
 
 ## Run tests with coverage
 test.coverage:
 	mkdir -p ./coverage
-	godotenv -f .env.test gotestsum --format=testdox -- -covermode=count -coverpkg=./... -coverprofile coverage/coverage.out ./...
+	go tool godotenv -f .env.test go tool gotestsum --format=testdox -- -covermode=count -coverpkg=./... -coverprofile coverage/coverage.out ./...
 	grep -v -E -f .covignore ./coverage/coverage.out > ./coverage/coverage.filtered.out
 	mv ./coverage/coverage.filtered.out ./coverage/coverage.out
 	go tool cover -func coverage/coverage.out -o coverage/coverage.tool
@@ -84,26 +80,22 @@ lint: lint.go lint.yml
 ## Lint go sources
 # Autofix is disabled if CI is set
 lint.go:
-	golangci-lint run $(if $(CI),,--fix) -c .golangci.yml --timeout 5m
+	go tool golangci-lint run
 
 ## Lint yaml files
 # Autofix is disabled if CI is set
 lint.yml:
-	yamlfmt -conf .yamlfmt.yml
+	go tool yamlfmt -conf .yamlfmt.yml
 
 ##@ Local Development
 
-## Run grpc-server
-grpc-server:
-	godotenv -f .env go run ./cmd/grpc-server/
+## Run connectrpc server
+connectrpc:
+	go tool godotenv -f .env go run ./cmd/connectrpc/
 
-## Run connect-server
-connect-server:
-	godotenv -f .env go run ./cmd/connect-server/
-
-## Run rest-server
-rest-server:
-	godotenv -f .env go run ./cmd/rest-server/
+## Run restapi server
+rest:
+	go tool godotenv -f .env go run ./cmd/restapi/
 
 # Ensures .env exists
 .env:

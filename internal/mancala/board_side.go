@@ -2,7 +2,7 @@ package mancala
 
 type (
 	pitsArray [pitsPerSide]int64
-	// BoardSide represents one of the sides of the board
+	// BoardSide represents one of the sides of the board.
 	BoardSide struct {
 		Pits   pitsArray `json:"pits"`
 		Store  int64     `json:"store"`

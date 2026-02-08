@@ -38,6 +38,8 @@ func Result(result mancala.Result) proto.Result {
 		return proto.Result_RESULT_PLAYER2_WINS
 	case mancala.Tie:
 		return proto.Result_RESULT_TIE
+	case mancala.Undefined:
+		return proto.Result_RESULT_UNSPECIFIED
 	default:
 		return proto.Result_RESULT_UNSPECIFIED
 	}

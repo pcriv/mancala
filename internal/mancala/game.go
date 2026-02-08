@@ -12,13 +12,13 @@ const (
 )
 
 const (
-	// Undefined represents a yet undefined result for a game
+	// Undefined represents a yet undefined result for a game.
 	Undefined Result = "Undefined"
-	// Player1Wins represents a game result where Player1 wins the game
+	// Player1Wins represents a game result where Player1 wins the game.
 	Player1Wins Result = "Player1Wins"
-	// Player2Wins represents a game result where Player2 wins the game
+	// Player2Wins represents a game result where Player2 wins the game.
 	Player2Wins Result = "Player2Wins"
-	// Tie represents a game result where both players have the same score
+	// Tie represents a game result where both players have the same score.
 	Tie Result = "Tie"
 )
 
@@ -37,14 +37,14 @@ type (
 		Result     Result    `json:"result"`
 	}
 
-	// Turn represents a turn on the mancala game, can be Player1Turn or Player2Turn
+	// Turn represents a turn on the mancala game, can be Player1Turn or Player2Turn.
 	Turn string
 
-	// Result represents the result of the game after it is done, can be Player1Wins, Player2Wins or Tie
+	// Result represents the result of the game after it is done, can be Player1Wins, Player2Wins or Tie.
 	Result string
 )
 
-// NewGame initializes a mancala game for the given players
+// NewGame initializes a mancala game for the given players.
 func NewGame(player1Name string, player2Name string) Game {
 	game := Game{}
 	game.ID = uuid.New()
@@ -89,11 +89,12 @@ func (game *Game) calculateScores() {
 	game.BoardSide1.score()
 	game.BoardSide2.score()
 
-	if game.BoardSide1.Player.Score > game.BoardSide2.Player.Score {
+	switch {
+	case game.BoardSide1.Player.Score > game.BoardSide2.Player.Score:
 		game.Result = Player1Wins
-	} else if game.BoardSide2.Player.Score > game.BoardSide1.Player.Score {
+	case game.BoardSide2.Player.Score > game.BoardSide1.Player.Score:
 		game.Result = Player2Wins
-	} else {
+	default:
 		game.Result = Tie
 	}
 }

@@ -43,14 +43,6 @@ const (
 	ServiceExecutePlayProcedure = "/mancala.Service/ExecutePlay"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	serviceServiceDescriptor           = proto.File_mancala_proto.Services().ByName("Service")
-	serviceCreateGameMethodDescriptor  = serviceServiceDescriptor.Methods().ByName("CreateGame")
-	serviceFindGameMethodDescriptor    = serviceServiceDescriptor.Methods().ByName("FindGame")
-	serviceExecutePlayMethodDescriptor = serviceServiceDescriptor.Methods().ByName("ExecutePlay")
-)
-
 // ServiceClient is a client for the mancala.Service service.
 type ServiceClient interface {
 	CreateGame(context.Context, *connect.Request[proto.CreateGameRequest]) (*connect.Response[proto.CreateGameResponse], error)
@@ -67,23 +59,24 @@ type ServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	serviceMethods := proto.File_mancala_proto.Services().ByName("Service").Methods()
 	return &serviceClient{
 		createGame: connect.NewClient[proto.CreateGameRequest, proto.CreateGameResponse](
 			httpClient,
 			baseURL+ServiceCreateGameProcedure,
-			connect.WithSchema(serviceCreateGameMethodDescriptor),
+			connect.WithSchema(serviceMethods.ByName("CreateGame")),
 			connect.WithClientOptions(opts...),
 		),
 		findGame: connect.NewClient[proto.FindGameRequest, proto.FindGameResponse](
 			httpClient,
 			baseURL+ServiceFindGameProcedure,
-			connect.WithSchema(serviceFindGameMethodDescriptor),
+			connect.WithSchema(serviceMethods.ByName("FindGame")),
 			connect.WithClientOptions(opts...),
 		),
 		executePlay: connect.NewClient[proto.ExecutePlayRequest, proto.ExecutePlayResponse](
 			httpClient,
 			baseURL+ServiceExecutePlayProcedure,
-			connect.WithSchema(serviceExecutePlayMethodDescriptor),
+			connect.WithSchema(serviceMethods.ByName("ExecutePlay")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -124,22 +117,23 @@ type ServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewServiceHandler(svc ServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	serviceMethods := proto.File_mancala_proto.Services().ByName("Service").Methods()
 	serviceCreateGameHandler := connect.NewUnaryHandler(
 		ServiceCreateGameProcedure,
 		svc.CreateGame,
-		connect.WithSchema(serviceCreateGameMethodDescriptor),
+		connect.WithSchema(serviceMethods.ByName("CreateGame")),
 		connect.WithHandlerOptions(opts...),
 	)
 	serviceFindGameHandler := connect.NewUnaryHandler(
 		ServiceFindGameProcedure,
 		svc.FindGame,
-		connect.WithSchema(serviceFindGameMethodDescriptor),
+		connect.WithSchema(serviceMethods.ByName("FindGame")),
 		connect.WithHandlerOptions(opts...),
 	)
 	serviceExecutePlayHandler := connect.NewUnaryHandler(
 		ServiceExecutePlayProcedure,
 		svc.ExecutePlay,
-		connect.WithSchema(serviceExecutePlayMethodDescriptor),
+		connect.WithSchema(serviceMethods.ByName("ExecutePlay")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/mancala.Service/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -15,7 +15,7 @@ plugins:
     out: proto
     opt: paths=source_relative
   # connect
-  - remote: buf.build/connectrpc/go:v1.16.2
+  - remote: buf.build/connectrpc/go
     out: proto
     opt:
       - paths=source_relative

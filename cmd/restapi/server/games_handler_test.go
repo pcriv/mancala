@@ -1,13 +1,10 @@
-package web
+package server
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/pcriv/mancala/internal/mancala"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/labstack/echo/v4"
@@ -15,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/pcriv/mancala/internal/mancala"
 	redisstore "github.com/pcriv/mancala/internal/store/redis"
 )
 
@@ -63,7 +61,7 @@ func TestGamesHandler_Show(t *testing.T) {
 	gameService := mancala.NewService(gameStore)
 	h := GamesHandler{GameService: gameService}
 
-	g, err := gameService.CreateGame(context.Background(), "Rick", "Morty")
+	g, err := gameService.CreateGame(t.Context(), "Rick", "Morty")
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -111,7 +109,7 @@ func newRedisClient(t *testing.T, url string) *redis.Client {
 	require.NoError(t, err)
 
 	client := redis.NewClient(options)
-	_, err = client.Ping(context.Background()).Result()
+	_, err = client.Ping(t.Context()).Result()
 	require.NoError(t, err)
 
 	return client

@@ -11,10 +11,10 @@ func TestNewGame(t *testing.T) {
 
 	assert.Equal(t, game.BoardSide1.Pits, fullSidePits)
 	assert.Equal(t, game.BoardSide2.Pits, fullSidePits)
-	assert.Equal(t, game.BoardSide1.Player.Name, "Rick")
-	assert.Equal(t, game.BoardSide2.Player.Name, "Morty")
-	assert.Equal(t, game.Turn, TurnPlayer1)
-	assert.Equal(t, game.Result, Undefined)
+	assert.Equal(t, "Rick", game.BoardSide1.Player.Name)
+	assert.Equal(t, "Morty", game.BoardSide2.Player.Name)
+	assert.Equal(t, TurnPlayer1, game.Turn)
+	assert.Equal(t, Undefined, game.Result)
 }
 
 func TestGame_PlayTurn(t *testing.T) {

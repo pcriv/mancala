@@ -1,17 +1,15 @@
-package web
+package server
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/pcriv/mancala/internal/mancala"
-
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/pcriv/mancala/internal/mancala"
 	redisstore "github.com/pcriv/mancala/internal/store/redis"
 )
 
@@ -24,7 +22,7 @@ func TestPlaysHandler_Create(t *testing.T) {
 	gameService := mancala.NewService(gameStore)
 	h := PlaysHandler{GameService: gameService}
 	e := echo.New()
-	g, err := gameService.CreateGame(context.Background(), "Rick", "Morty")
+	g, err := gameService.CreateGame(t.Context(), "Rick", "Morty")
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -45,7 +43,11 @@ func TestPlaysHandler_Create(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			rq := httptest.NewRequest(http.MethodPost, "/v1/games/:id/plays", strings.NewReader(tc.body))
+			rq := httptest.NewRequest(
+				http.MethodPost,
+				"/v1/games/:id/plays",
+				strings.NewReader(tc.body),
+			)
 			rq.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rc := httptest.NewRecorder()
 			ctx := e.NewContext(rq, rc)

@@ -1,33 +1,102 @@
 ---
-linters:
-  disable-all: true
+version: "2"
+run:
+  relative-path-mode: gomod
+formatters:
   enable:
-    ## Default set
-    - errcheck
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - typecheck
-    - unused
-    - bodyclose
-    ## Additional
-    - revive
-    - goconst
-    - gocyclo
     - gofumpt
     - goimports
-    - nolintlint
-    - predeclared
-    - stylecheck
-    - unconvert
-
-linters-settings:
-  # https://golangci-lint.run/usage/linters/#nolintlint
-  nolintlint:
-    # Enable to require an explanation of nonzero length after each nolint directive.
-    # Default: false
-    require-explanation: true
-    # Enable to require nolint directives to mention the specific linter being suppressed.
-    # Default: false
-    require-specific: true
+    - golines
+    - gci
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - localmodule
+    golines:
+      max-len: 150
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - depguard
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - forbidigo
+    - gocritic
+    - gosec
+    - govet
+    - inamedparam
+    - noctx
+    - nlreturn
+    - protogetter
+    - sloglint
+    - spancheck
+    - testifylint
+    - usestdlibvars
+    - usetesting
+  settings:
+    depguard:
+      rules:
+        deprecated:
+          files:
+            - $all
+          deny:
+            - pkg: github.com/golang/protobuf
+              desc: Use google.golang.org/protobuf instead, see https://developers.google.com/protocol-buffers/docs/reference/go/faq#modules
+            - pkg: github.com/satori/go.uuid
+              desc: Use github.com/google/uuid instead, satori's package is not maintained
+            - pkg: github.com/gofrs/uuid$
+              desc: Use github.com/gofrs/uuid/v5 or later, it was not a go module before v5
+            - pkg: github.com/aws/aws-sdk-go/aws
+              desc: Use github.com/aws/aws-sdk-go-v2 instead, see https://aws.github.io/aws-sdk-go-v2/docs/migrating/
+    exhaustive:
+      default-signifies-exhaustive: true
+    forbidigo:
+      forbid:
+        - pattern: fmt\.Print.*
+          msg: Use log/slog for logging instead of fmt.Print
+        - pattern: fmt\.Fprint.*
+          msg: Use log/slog for logging instead of fmt.Fprint
+      exclude-godoc-examples: true
+      analyze-types: true
+    testifylint:
+      enable-all: true
+    errcheck:
+      check-type-assertions: true
+    govet:
+      disable:
+        - fieldalignment
+      enable-all: true
+      settings:
+        shadow:
+          strict: true
+    sloglint:
+      attr-only: true
+      no-global: all
+      msg-style: lowercased
+      key-naming-case: snake
+      context: scope
+    spancheck:
+      checks:
+        - end
+        - record-error
+        - set-status
+  exclusions:
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+    rules:
+      # Exclude some linters from running on test files.
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+          - forbidigo
+          - noctx
+issues:
+  max-same-issues: 50

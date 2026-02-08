@@ -1,12 +1,12 @@
-package web
+package server
 
 import (
 	"errors"
 	"net/http"
 
-	"github.com/pcriv/mancala/cmd/rest-server/internal/openapimap"
-
 	"github.com/labstack/echo/v4"
+
+	"github.com/pcriv/mancala/cmd/restapi/openapimap"
 	"github.com/pcriv/mancala/internal/mancala"
 	"github.com/pcriv/mancala/internal/openapi"
 )

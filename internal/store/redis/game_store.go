@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pcriv/mancala/internal/mancala"
-
 	"github.com/redis/go-redis/v9"
+
+	"github.com/pcriv/mancala/internal/mancala"
 )
+
+const defaultGameTTL = time.Hour * 2
 
 // GameStore is a redis backed game repo.
 type GameStore struct {
@@ -28,7 +30,7 @@ func (r GameStore) Save(ctx context.Context, g mancala.Game) error {
 	if err != nil {
 		return err
 	}
-	err = r.db.Set(ctx, g.ID.String(), string(j), time.Hour*2).Err()
+	err = r.db.Set(ctx, g.ID.String(), string(j), defaultGameTTL).Err()
 	if err != nil {
 		return err
 	}
@@ -40,7 +42,10 @@ func (r GameStore) Find(ctx context.Context, id string) (mancala.Game, error) {
 	var g mancala.Game
 	val, err := r.db.Get(ctx, id).Result()
 	if err != nil {
-		return g, errors.Join(mancala.ErrGameNotFound, fmt.Errorf("%w: cannot find game with id %v", err, id))
+		return g, errors.Join(
+			mancala.ErrGameNotFound,
+			fmt.Errorf("%w: cannot find game with id %v", err, id),
+		)
 	}
 	err = json.Unmarshal([]byte(val), &g)
 	if err != nil {

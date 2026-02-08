@@ -1,7 +1,8 @@
-package web
+package server
 
 import (
 	"github.com/getkin/kin-openapi/openapi3"
+
 	"github.com/pcriv/mancala/internal/mancala"
 	"github.com/pcriv/mancala/internal/openapi"
 )
