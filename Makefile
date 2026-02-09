@@ -55,6 +55,7 @@ deps-macos:
 build:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_OPTS) -o bin/$(SERVICE)-connectrpc ./cmd/connectrpc/
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_OPTS) -o bin/$(SERVICE)-restapi ./cmd/restapi/
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_OPTS) -o bin/$(SERVICE)-web ./cmd/web/
 
 ##@ Testing
 
@@ -96,6 +97,10 @@ connectrpc:
 ## Run restapi server
 rest:
 	go tool godotenv -f .env go run ./cmd/restapi/
+
+## Run web frontend
+web:
+	go tool godotenv -f .env go run ./cmd/web/
 
 # Ensures .env exists
 .env:

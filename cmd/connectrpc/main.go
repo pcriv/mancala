@@ -78,8 +78,8 @@ func run() (*slog.Logger, error) {
 	g.Go(func() error {
 		logger.Info("starting connect server on address", slog.String("address", cfg.Address))
 
-		if svrErr := svr.ListenAndServe(); svrErr != nil {
-			return fmt.Errorf("failed to listen and serve connect service: %w", err)
+		if svrErr := svr.ListenAndServe(); svrErr != nil && !errors.Is(svrErr, http.ErrServerClosed) {
+			return fmt.Errorf("failed to listen and serve connect service: %w", svrErr)
 		}
 
 		return nil
@@ -88,8 +88,8 @@ func run() (*slog.Logger, error) {
 	g.Go(func() error {
 		<-ctx.Done()
 
-		if svrErr := svr.Close(); svrErr != nil {
-			return fmt.Errorf("failed to close server: %w", err)
+		if svrErr := svr.Shutdown(context.Background()); svrErr != nil {
+			return fmt.Errorf("failed to shutdown server: %w", svrErr)
 		}
 
 		return nil
