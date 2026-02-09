@@ -24,7 +24,7 @@ const (
 
 const (
 	pitsPerSide  int64 = 6
-	stonesPerPit int64 = 6
+	stonesPerPit int64 = 4
 )
 
 type (
