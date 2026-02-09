@@ -1,11 +1,66 @@
 ---
 services:
   redis:
+    container_name: mancala-redis
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/var/lib/redis/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  connectrpc:
+    container_name: mancala-connectrpc
+    build: .
+    command: air -c .air.connectrpc.toml
+    ports:
+      - "50051:50051"
+    environment:
+      REDIS_URL: redis://redis:6379/10
+    depends_on:
+      redis:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./cmd
+          target: /app/cmd
+        - action: sync
+          path: ./internal
+          target: /app/internal
+        - action: sync
+          path: ./proto
+          target: /app/proto
+        - action: rebuild
+          path: ./go.mod
+
+  web:
+    container_name: mancala-web
+    build: .
+    command: air -c .air.web.toml
+    ports:
+      - "8080:8080"
+    environment:
+      CONNECT_RPC_URL: http://connectrpc:50051
+    depends_on:
+      - connectrpc
+    develop:
+      watch:
+        - action: sync
+          path: ./cmd
+          target: /app/cmd
+        - action: sync
+          path: ./internal
+          target: /app/internal
+        - action: sync
+          path: ./proto
+          target: /app/proto
+        - action: rebuild
+          path: ./go.mod
 
 volumes:
   redis-data:
