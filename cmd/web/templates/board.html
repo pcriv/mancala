@@ -1,0 +1,98 @@
+{{define "board.html"}}
+<div id="board"
+    {{if not (isGameOver .Game)}}
+    hx-get="/games/{{.Game.GetId}}/board"
+    hx-trigger="every 3s"
+    hx-swap="outerHTML"
+    {{end}}
+    class="bg-neutral rounded-2xl p-6 shadow-xl">
+
+    {{if .Error}}
+    <div class="alert alert-error mb-4 justify-center">
+        {{.Error}}
+    </div>
+    {{end}}
+
+    {{if isGameOver .Game}}
+    <div class="alert alert-info mb-4 justify-center text-lg font-bold">
+        Game Over: {{resultText .Game}}
+    </div>
+    {{else}}
+    <div class="text-center mb-4">
+        <span class="badge badge-lg py-3 px-4">
+            {{if isPlayer1Turn .Game}}
+                {{.Game.GetBoardSide1.GetPlayer.GetName}}'s turn
+            {{else}}
+                {{.Game.GetBoardSide2.GetPlayer.GetName}}'s turn
+            {{end}}
+        </span>
+    </div>
+    {{end}}
+
+    <div class="grid grid-cols-8 gap-3 items-center">
+        {{/* Player 2 name */}}
+        <div class="col-span-8 flex justify-between text-neutral-content text-sm font-medium px-1">
+            <span></span>
+            <span>{{.Game.GetBoardSide2.GetPlayer.GetName}} (Score: {{.Game.GetBoardSide2.GetStore}})</span>
+        </div>
+
+        {{/* Player 2 store (left side) */}}
+        <div class="row-span-2 flex items-center justify-center">
+            <div class="bg-base-300 text-base-content rounded-2xl w-16 h-32 flex items-center justify-center text-2xl font-bold shadow-inner{{if .Animate}} animate-store-glow{{end}}">
+                {{.Game.GetBoardSide2.GetStore}}
+            </div>
+        </div>
+
+        {{/* Player 2 pits (reversed: 5,4,3,2,1,0) */}}
+        {{$game := .Game}}
+        {{$animate := .Animate}}
+        {{range $i := seq 6}}
+        <div class="flex justify-center">
+            <button
+                hx-post="/games/{{$game.GetId}}/play"
+                hx-vals='{"pit_index": "{{sub 5 $i}}"}'
+                hx-target="#board"
+                hx-swap="outerHTML"
+                {{if or (isGameOver $game) (not (isPlayer2Turn $game)) (eq (index ($game.GetBoardSide2.GetPits) (sub 5 $i)) 0)}}
+                disabled
+                {{end}}
+                class="btn btn-circle btn-md{{if and (not (isGameOver $game)) (isPlayer2Turn $game)}} btn-accent btn-outline enabled:border-2{{else}} btn-ghost bg-base-300{{end}} text-base-content text-lg font-bold disabled:opacity-60{{if $animate}} animate-stone-drop{{end}}"
+                {{if $animate}}style="--i: {{$i}}"{{end}}>
+                {{index ($game.GetBoardSide2.GetPits) (sub 5 $i)}}
+            </button>
+        </div>
+        {{end}}
+
+        {{/* Player 1 store (right side) */}}
+        <div class="row-span-2 flex items-center justify-center">
+            <div class="bg-base-300 text-base-content rounded-2xl w-16 h-32 flex items-center justify-center text-2xl font-bold shadow-inner{{if .Animate}} animate-store-glow{{end}}">
+                {{.Game.GetBoardSide1.GetStore}}
+            </div>
+        </div>
+
+        {{/* Player 1 pits (0,1,2,3,4,5) */}}
+        {{range $i := seq 6}}
+        <div class="flex justify-center">
+            <button
+                hx-post="/games/{{$game.GetId}}/play"
+                hx-vals='{"pit_index": "{{$i}}"}'
+                hx-target="#board"
+                hx-swap="outerHTML"
+                {{if or (isGameOver $game) (not (isPlayer1Turn $game)) (eq (index ($game.GetBoardSide1.GetPits) $i) 0)}}
+                disabled
+                {{end}}
+                class="btn btn-circle btn-md{{if and (not (isGameOver $game)) (isPlayer1Turn $game)}} btn-accent btn-outline enabled:border-2{{else}} btn-ghost bg-base-300{{end}} text-base-content text-lg font-bold disabled:opacity-60{{if $animate}} animate-stone-drop{{end}}"
+                {{if $animate}}style="--i: {{add $i 6}}"{{end}}>
+                {{index ($game.GetBoardSide1.GetPits) $i}}
+            </button>
+        </div>
+        {{end}}
+
+        {{/* Player 1 name */}}
+        <div class="col-span-8 flex justify-between text-neutral-content text-sm font-medium px-1">
+            <span></span>
+            <span>{{.Game.GetBoardSide1.GetPlayer.GetName}} (Score: {{.Game.GetBoardSide1.GetStore}})</span>
+        </div>
+    </div>
+</div>
+{{end}}
