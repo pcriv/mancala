@@ -1,0 +1,40 @@
+{{template "layout" .}}
+{{define "content"}}
+<div class="max-w-md mx-auto mt-12">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h1 class="card-title text-3xl justify-center mb-2">New Game</h1>
+
+            {{if .Error}}
+            <div class="alert alert-error mb-4">
+                {{.Error}}
+            </div>
+            {{end}}
+
+            <form method="POST" action="/games" class="space-y-5">
+                <div class="form-control w-full">
+                    <label class="label" for="player1">
+                        <span class="label-text">Player 1</span>
+                    </label>
+                    <input type="text" id="player1" name="player1" value="{{.Player1}}"
+                        required
+                        class="input input-bordered w-full"
+                        placeholder="Enter name">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label" for="player2">
+                        <span class="label-text">Player 2</span>
+                    </label>
+                    <input type="text" id="player2" name="player2" value="{{.Player2}}"
+                        required
+                        class="input input-bordered w-full"
+                        placeholder="Enter name">
+                </div>
+                <button type="submit" class="btn btn-primary w-full">
+                    Start Game
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{{end}}

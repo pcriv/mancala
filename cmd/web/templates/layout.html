@@ -1,0 +1,68 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en" data-theme="forest">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mancala</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <style>
+        @keyframes stone-drop {
+            0% {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+
+            70% {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.0);
+            }
+        }
+
+        @keyframes store-glow {
+            0% {
+                box-shadow: inset 0 0 0 0 rgba(140, 100, 60, 0);
+            }
+
+            50% {
+                box-shadow: inset 0 0 12px 4px rgba(140, 100, 60, 0.5);
+            }
+
+            100% {
+                box-shadow: inset 0 0 0 0 rgba(140, 100, 60, 0);
+            }
+        }
+
+        .animate-stone-drop {
+            animation: stone-drop 400ms ease-out both;
+            animation-delay: calc(var(--i) * 60ms);
+        }
+
+        .animate-store-glow {
+            animation: store-glow 600ms ease-in-out both;
+        }
+    </style>
+</head>
+
+<body class="bg-base-200 min-h-screen">
+    <div class="navbar bg-neutral text-neutral-content shadow-lg">
+        <div class="max-w-4xl mx-auto w-full">
+            <a href="/" class="btn btn-ghost text-2xl font-bold tracking-wide">Mancala</a>
+        </div>
+    </div>
+    <main class="max-w-4xl mx-auto p-6">
+        {{block "content" .}}{{end}}
+    </main>
+</body>
+
+</html>
+{{end}}

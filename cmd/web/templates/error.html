@@ -1,0 +1,14 @@
+{{template "layout" .}}
+{{define "content"}}
+<div class="max-w-md mx-auto mt-12">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body text-center">
+            <h1 class="card-title text-3xl justify-center mb-2">{{.Title}}</h1>
+            <p class="mb-6">{{.Message}}</p>
+            <a href="/" class="btn btn-primary">
+                Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,18 @@
+{{template "layout" .}}
+{{define "content"}}
+<div class="mt-8">
+    <div class="mb-6 flex items-center justify-between" x-data="{copied: false}">
+        <h1 class="text-2xl font-bold text-base-content">
+            {{.Game.GetBoardSide1.GetPlayer.GetName}} vs {{.Game.GetBoardSide2.GetPlayer.GetName}}
+        </h1>
+        <button
+            @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 2000)"
+            class="btn btn-ghost btn-sm">
+            <span x-show="!copied">Copy game link</span>
+            <span x-show="copied" x-cloak>Copied!</span>
+        </button>
+    </div>
+
+    {{template "board.html" .}}
+</div>
+{{end}}
