@@ -26,20 +26,20 @@ func TestGame_PlayTurn(t *testing.T) {
 		wantErr  string
 	}{
 		{
-			name:     "when player1 captures one stone and has to play another turn",
+			name:     "when player1 plays from pit 0 and turn passes to player2",
 			pitIndex: 0,
 			game:     NewGame("Rick", "Morty"),
 			wantGame: Game{
 				BoardSide1: BoardSide{
-					Pits:  buildPits(0, 7, 7, 7, 7, 7),
-					Store: 1,
+					Pits:  buildPits(0, 5, 5, 5, 5, 4),
+					Store: 0,
 				},
 				BoardSide2: BoardSide{
 					Pits:  fullSidePits,
 					Store: 0,
 				},
 				Result: Undefined,
-				Turn:   TurnPlayer1,
+				Turn:   TurnPlayer2,
 			},
 		},
 		{
@@ -87,7 +87,7 @@ func TestGame_PlayTurn(t *testing.T) {
 					Store: 1,
 				},
 				BoardSide2: BoardSide{
-					Pits:  buildPits(7, 7, 7, 7, 7, 7),
+					Pits:  buildPits(5, 5, 5, 5, 5, 5),
 					Store: 0,
 				},
 				Result: Undefined,

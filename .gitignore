@@ -9,6 +9,7 @@
 *.out
 *.so
 *.test
+!.env.test
 /coverage/
 /node_modules/
 /vendor/
