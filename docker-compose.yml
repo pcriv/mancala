@@ -16,7 +16,7 @@ services:
   connectrpc:
     container_name: mancala-connectrpc
     build: .
-    command: air -c .air.connectrpc.toml
+    command: ["-c", ".air.connectrpc.toml"]
     ports:
       - "50051:50051"
     environment:
@@ -41,7 +41,7 @@ services:
   web:
     container_name: mancala-web
     build: .
-    command: air -c .air.web.toml
+    command: ["-c", ".air.web.toml"]
     ports:
       - "8080:8080"
     environment:
