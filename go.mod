@@ -15,7 +15,7 @@ require (
 	github.com/oapi-codegen/oapi-codegen/v2 v2.5.1
 	github.com/oapi-codegen/runtime v1.1.2
 	github.com/redis/go-redis/v9 v9.17.3
-	github.com/samber/slog-echo v1.20.1
+	github.com/samber/slog-echo v1.21.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.50.0
 	golang.org/x/sync v0.19.0
