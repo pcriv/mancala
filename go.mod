@@ -6,7 +6,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1
 	connectrpc.com/connect v1.19.1
 	connectrpc.com/validate v0.6.0
-	github.com/alicebob/miniredis/v2 v2.36.1
+	github.com/alicebob/miniredis/v2 v2.38.0
 	github.com/caarlos0/env/v11 v11.4.0
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/google/uuid v1.6.0
