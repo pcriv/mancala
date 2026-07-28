@@ -8,7 +8,7 @@ require (
 	connectrpc.com/validate v0.6.0
 	github.com/alicebob/miniredis/v2 v2.38.0
 	github.com/caarlos0/env/v11 v11.4.1
-	github.com/getkin/kin-openapi v0.142.0
+	github.com/getkin/kin-openapi v0.144.0
 	github.com/google/uuid v1.6.0
 	github.com/labstack/echo/v4 v4.15.4
 	github.com/oapi-codegen/echo-middleware v1.0.2
